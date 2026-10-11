@@ -10,7 +10,7 @@ import uuid
 from app import db, llm, prompts
 
 log = logging.getLogger("chilldesk.automation")
-IDLE_SECONDS = 90  # voice/web conversations idle this long are treated as finished
+IDLE_SECONDS = 10  # voice/web conversations idle this long are treated as finished (short for live demos)
 
 
 def _transcript(messages: list[dict]) -> str:
@@ -52,7 +52,7 @@ async def analyze(conversation_id: str) -> dict | None:
 async def sweeper() -> None:
     """Background loop: analyze conversations that went idle without being closed (e.g. voice calls)."""
     while True:
-        await asyncio.sleep(20)
+        await asyncio.sleep(5)
         try:
             rows = await asyncio.to_thread(db.query,
                 "SELECT id FROM conversations WHERE analysis IS NULL AND jsonb_array_length(messages) > 1 "

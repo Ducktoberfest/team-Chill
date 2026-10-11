@@ -269,7 +269,7 @@ function results() {
       fill: { color: i >= 6 ? C.accent3 : C.accent1, transparency: 85 }, line: { color: i >= 6 ? C.accent3 : C.accent1, width: 0.75, transparency: 40 } });
     text(s, `anim_ot${i}`, o, { x: 9.65, y: 2.35 + i * 0.42, w: 2.6, h: 0.34, fontSize: 12, bold: true, color: i >= 6 ? C.accent3 : C.accent1, valign: "middle" });
   });
-  s.addNotes("Hər söhbət bitəndə və ya səsli zəng 90 saniyə sakit qalanda Gemma 4 onu analiz edir: xülasə, prioritet, emosiya, lazım olsa avto-bilet və müştəriyə hazır follow-up email. Hamısı Neon-a yazılır və dashboard-da görünür.");
+  s.addNotes("Hər söhbət bitəndə və ya söhbət 10 saniyə sakit qalanda Gemma 4 onu analiz edir: xülasə, prioritet, emosiya, lazım olsa avto-bilet və müştəriyə hazır follow-up email. Hamısı Neon-a yazılır və dashboard-da görünür.");
 
   // =============================================================== 7. architecture
   s = pres.addSlide({ masterName: "LIGHT_CONTENT" });

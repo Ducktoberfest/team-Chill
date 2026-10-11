@@ -18,7 +18,7 @@ function conv(c) {
     <span class="time">${time(c.updated_at)}</span></div>`;
   if (!a) {
     return `<div class="conv">${head}<div><button class="btn ghost" onclick="analyze('${esc(c.id)}', this)"><i data-lucide="zap"></i> İndi analiz et</button>
-      <span class="muted">Boş qalan söhbətlər 90 saniyədən sonra avtomatik analiz olunur.</span></div></div>`;
+      <span class="muted">Boş qalan söhbətlər 10 saniyədən sonra avtomatik analiz olunur.</span></div></div>`;
   }
   return `<div class="conv">${head}
     <div>${tag(a.category, "")} ${tag(a.urgency)} ${tag(a.sentiment)} ${a.resolved ? tag("həll olundu", "ok") : tag("açıq", "medium")}

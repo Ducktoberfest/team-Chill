@@ -54,7 +54,8 @@ def _session(conversation_id: str | None, channel: str, customer_id: str | None)
 def _save(s: Session) -> None:
     if s.conversation_id not in HISTORY:  # conversation was closed while this turn was running
         return
-    db.execute("UPDATE conversations SET messages = %s, customer_id = %s, updated_at = now() WHERE id = %s",
+    # a new turn makes any earlier automatic analysis stale; the sweeper re-analyzes after the next idle period
+    db.execute("UPDATE conversations SET messages = %s, customer_id = %s, updated_at = now(), analysis = NULL WHERE id = %s",
                (db.Jsonb(agent.storable(HISTORY[s.conversation_id])), s.customer_id, s.conversation_id))
 
 
