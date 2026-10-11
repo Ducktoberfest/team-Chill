@@ -13,6 +13,7 @@ import sys
 import tempfile
 import zipfile
 
+ENTRANCE = False  # Morph alone carries the motion; per-object entrances on top of it felt busy
 STAGGER_MS = 110
 DUR_MS = 800
 MORPH = ('<mc:AlternateContent xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">'
@@ -94,7 +95,7 @@ def process(xml: str) -> str:
         items.append((nv.group(1), kind))
         if m.group(1) == "sp" and "<p:txBody>" in m.group(0):
             text_ids.add(nv.group(1))
-    timing = timing_xml(items, text_ids) if items else ""
+    timing = timing_xml(items, text_ids) if (items and ENTRANCE) else ""
     anchor = "</p:clrMapOvr>"
     if anchor in xml:
         return xml.replace(anchor, anchor + MORPH + timing, 1)
