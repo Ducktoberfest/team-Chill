@@ -48,6 +48,7 @@ def main() -> None:
     print(f"loaded {len(CUSTOMERS)} customers, {len(PRODUCTS)} products, {len(ORDERS)} orders, {len(chunks)} KB chunks")
     for q in ["pul nə vaxt karta qayıdır?", "sifarişim gecikir", "qulaqlıq sınıq gəldi"]:
         print(q, "->", [r["title"] for r in rag.search(q, 2)])
+    db.pool().close()
 
 
 if __name__ == "__main__":

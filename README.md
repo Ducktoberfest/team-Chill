@@ -40,7 +40,7 @@ The demo store is **Səbət**, a fictional Azerbaijani online shop. All customer
 
 | Component | Model / library | License |
 |---|---|---|
-| Agent + vision + automation | **Gemma 4** `gemma-4-31b-it` via the Gemini API, or `gemma4:e4b-it-qat` locally via Ollama | [Apache 2.0](https://opensource.googleblog.com/2026/03/gemma-4-expanding-the-gemmaverse-with-apache-20.html) |
+| Agent + vision + automation | **Gemma 4** `gemma-4-26b-a4b-it` via the Gemini API, or `gemma4:e4b-it-qat` locally via Ollama | [Apache 2.0](https://opensource.googleblog.com/2026/03/gemma-4-expanding-the-gemmaverse-with-apache-20.html) |
 | Embeddings | **EmbeddingGemma** (`embeddinggemma` in Ollama, 768-dim) | [Gemma Terms of Use](https://ai.google.dev/gemma/terms) |
 | Voice I/O | ElevenLabs Conversational AI (STT + TTS only; reasoning is done by Gemma) | proprietary service |
 | Database | Neon Postgres + pgvector | — |

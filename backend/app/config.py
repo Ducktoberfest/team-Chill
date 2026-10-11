@@ -16,7 +16,7 @@ def env(name: str, default: str = "") -> str:
 
 LLM_BACKEND = env("LLM_BACKEND", "gemini")  # gemini | ollama
 GEMINI_API_KEY = env("GEMINI_API_KEY")
-GEMINI_MODEL = env("GEMINI_MODEL", "gemma-4-31b-it")
+GEMINI_MODEL = env("GEMINI_MODEL", "gemma-4-26b-a4b-it")
 OLLAMA_URL = env("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 OLLAMA_MODEL = env("OLLAMA_MODEL", "gemma4:e4b-it-qat")
 EMBED_MODEL = env("EMBED_MODEL", "embeddinggemma")

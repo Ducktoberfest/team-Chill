@@ -92,7 +92,7 @@ async def _chat_gemini(messages, tools, json_schema) -> Reply:
     if tools:
         cfg.tools = [types.Tool(function_declarations=[
             types.FunctionDeclaration(name=t["name"], description=t["description"],
-                                      parameters_json_schema=t["parameters"]) for t in tools])]
+                                      parameters=t["parameters"]) for t in tools])]
     if json_schema:
         cfg.response_mime_type = "application/json"
         cfg.response_json_schema = json_schema
