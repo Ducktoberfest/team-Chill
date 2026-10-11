@@ -7,7 +7,7 @@
   <link rel="icon" href="/static/brand/mallard.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=11">
+  <link rel="stylesheet" href="/static/styles.css?v=14">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
@@ -16,6 +16,7 @@
     <div class="logo"><span class="logo-mark"><img src="/static/brand/mallard.svg" alt=""></span> ChillDesk</div>
     <span class="pill" id="model">Gemma 4</span>
     <div class="spacer"></div>
+        <button class="btn" id="open-analytics"><i data-lucide="chart-pie"></i> Analitika</button>
         <a class="link" href="/">Mallard mağazası</a>
   </header>
   <div class="wrap">
@@ -41,6 +42,13 @@
       </div>
     </div>
   </div>
-  <script type="module" src="/static/dashboard.js?v=11"></script>
+  <section id="analytics" class="analytics" hidden>
+    <div class="an-head">
+      <div><h2>Analitika</h2><p class="muted">Neon-dakı bütün söhbətlər, biletlər, qaytarmalar və sifarişlər · Gemma 4 analizi</p></div>
+      <button class="icon-btn" id="close-analytics" title="Bağla"><i data-lucide="x"></i></button>
+    </div>
+    <div class="an-grid" id="an-grid"></div>
+  </section>
+  <script type="module" src="/static/dashboard.js?v=12"></script>
 </body>
 </html>

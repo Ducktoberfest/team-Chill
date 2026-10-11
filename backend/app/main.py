@@ -233,6 +233,26 @@ def dashboard():
             "kb_gaps": [a["kb_gap"] for a in analyzed if a.get("kb_gap")]}
 
 
+@app.get("/api/analytics")
+def analytics():
+    """Aggregates over everything in Neon, for the dashboard's analytics view."""
+    def count(sql: str) -> list[dict]:
+        return [{"label": r["k"] or "—", "value": r["n"]} for r in db.query(sql)]
+    return {
+        "channel": count("SELECT channel AS k, count(*) AS n FROM conversations WHERE jsonb_array_length(messages) > 0 GROUP BY 1 ORDER BY 2 DESC"),
+        "category": count("SELECT analysis->>'category' AS k, count(*) AS n FROM conversations WHERE analysis IS NOT NULL GROUP BY 1 ORDER BY 2 DESC"),
+        "urgency": count("SELECT analysis->>'urgency' AS k, count(*) AS n FROM conversations WHERE analysis IS NOT NULL GROUP BY 1 ORDER BY 2 DESC"),
+        "sentiment": count("SELECT analysis->>'sentiment' AS k, count(*) AS n FROM conversations WHERE analysis IS NOT NULL GROUP BY 1 ORDER BY 2 DESC"),
+        "resolved": count("SELECT CASE WHEN (analysis->>'resolved')::bool THEN 'agent özü həll etdi' WHEN (analysis->>'needs_human')::bool THEN 'insana ötürüldü' "
+                          "ELSE 'açıq' END AS k, count(*) AS n FROM conversations WHERE analysis IS NOT NULL GROUP BY 1 ORDER BY 2 DESC"),
+        "ticket_team": count("SELECT team AS k, count(*) AS n FROM tickets GROUP BY 1 ORDER BY 2 DESC"),
+        "ticket_source": count("SELECT CASE source WHEN 'automation' THEN 'avtomatlaşdırma' ELSE 'agent' END AS k, count(*) AS n FROM tickets GROUP BY 1 ORDER BY 2 DESC"),
+        "returns": count("SELECT resolution AS k, count(*) AS n FROM returns GROUP BY 1 ORDER BY 2 DESC"),
+        "orders": count("SELECT status AS k, count(*) AS n FROM orders GROUP BY 1 ORDER BY 2 DESC"),
+        "revenue": float(db.one("SELECT coalesce(sum(total), 0) AS s FROM orders")["s"]),
+    }
+
+
 @app.get("/api/conversations/{cid}")
 def get_conversation(cid: str):
     row = db.one("SELECT * FROM conversations WHERE id = %s", (cid,))

@@ -16,7 +16,9 @@ async def respond(s: Session, history: list[dict], user_msg: dict) -> AsyncItera
       {"type": "text", "text"}                               the final answer (once)
     `history` is the prior conversation (no system message) and is extended in place."""
     customer = db.one("SELECT * FROM customers WHERE id = %s", (s.customer_id,)) if s.customer_id else None
-    orders = await asyncio.to_thread(tools.orders_snapshot, s.customer_id) if s.customer_id else None
+    # voice gets the orders up front to skip tool round trips; chat calls the tools so every step is visible
+    voice = s.channel == "voice"
+    orders = await asyncio.to_thread(tools.orders_snapshot, s.customer_id) if (s.customer_id and voice) else None
     history.append(user_msg)
     for _ in range(MAX_STEPS):
         system = {"role": "system", "content": prompts.agent_prompt(s.channel, customer, orders)}
@@ -31,7 +33,7 @@ async def respond(s: Session, history: list[dict], user_msg: dict) -> AsyncItera
             result = await asyncio.to_thread(tools.run, s, tc["name"], tc["args"])
             if tc["name"] == "find_customer" and result.get("found"):
                 customer = db.one("SELECT * FROM customers WHERE id = %s", (s.customer_id,))
-                orders = await asyncio.to_thread(tools.orders_snapshot, s.customer_id)
+                orders = await asyncio.to_thread(tools.orders_snapshot, s.customer_id) if voice else None
             history.append({"role": "tool", "tool_call_id": tc["id"], "name": tc["name"], "content": tools.result_text(result)})
             yield {"type": "tool", "name": tc["name"], "label": tools.STATUS_LABELS.get(tc["name"], tc["name"]),
                    "args": tc["args"], "result": result}
