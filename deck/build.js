@@ -30,12 +30,22 @@ const HEX = THEME.colors;
 // ------------------------------------------------------------------ generated art
 async function meshPng(file, dark) {
   const blobs = dark
-    ? [["16C79A", 0.42, 18, 20, 38], ["14B8A6", 0.30, 85, 15, 32], ["F97316", 0.24, 75, 95, 36], ["0B7A5C", 0.35, 10, 90, 30]]
-    : [["16C79A", 0.30, 8, 12, 34], ["14B8A6", 0.24, 92, 8, 30], ["F97316", 0.18, 78, 96, 36], ["0F2A33", 0.08, 15, 95, 30]];
+    ? [["2EE6B0", 0.55, 14, 16, 30], ["14B8A6", 0.45, 88, 10, 26], ["F97316", 0.38, 78, 98, 28], ["0B7A5C", 0.6, 6, 92, 26], ["5EEAD4", 0.25, 55, 45, 18]]
+    : [["2EE6B0", 0.55, 6, 10, 28], ["5EEAD4", 0.5, 94, 6, 24], ["FDBA4D", 0.42, 80, 100, 26], ["A7F3D0", 0.5, 12, 98, 22], ["14B8A6", 0.18, 55, 50, 16]];
   const base = dark ? "#0F2A33" : "#F9F6F0";
   const defs = blobs.map(([c, o], i) => `<radialGradient id="g${i}"><stop offset="0" stop-color="#${c}" stop-opacity="${o}"/><stop offset="1" stop-color="#${c}" stop-opacity="0"/></radialGradient>`).join("");
   const circles = blobs.map(([, , x, y, r], i) => `<ellipse cx="${x * 19.2}" cy="${y * 10.8}" rx="${r * 26}" ry="${r * 20}" fill="url(#g${i})"/>`).join("");
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080"><defs>${defs}</defs><rect width="1920" height="1080" fill="${base}"/>${circles}</svg>`;
+  await sharp(Buffer.from(svg)).blur(40).png().toFile(path.join(ASSETS, file));
+}
+
+// frosted glass sphere used as a morphing decoration (same name on every slide -> Morph glides it)
+async function glassOrbPng(file, tint) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800"><defs>
+    <radialGradient id="f" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".45" stop-color="#${tint}" stop-opacity=".28"/><stop offset="1" stop-color="#${tint}" stop-opacity=".10"/></radialGradient>
+    <linearGradient id="e" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".5" stop-color="#fff" stop-opacity=".15"/><stop offset="1" stop-color="#fff" stop-opacity=".6"/></linearGradient></defs>
+    <circle cx="400" cy="400" r="380" fill="url(#f)"/><circle cx="400" cy="400" r="378" fill="none" stroke="url(#e)" stroke-width="6"/>
+    <ellipse cx="290" cy="230" rx="150" ry="80" fill="#fff" fill-opacity=".35" transform="rotate(-30 290 230)"/></svg>`;
   await sharp(Buffer.from(svg)).png().toFile(path.join(ASSETS, file));
 }
 
@@ -74,6 +84,8 @@ function results() {
   await meshPng("bg-light.png", false);
   await meshPng("bg-dark.png", true);
   await ripplePng("ripples-light.png", "14B8A6", 0.55);
+  await glassOrbPng("orb-a.png", "14B8A6");
+  await glassOrbPng("orb-b.png", "F97316");
   await ripplePng("ripples-dark.png", "0B7A5C", 0.45);
   await sharp(path.join(HERE, "..", "web", "brand", "mallard.svg")).resize(512, 512).png().toFile(path.join(ASSETS, "logo.png"));
   const LOGO = path.join(ASSETS, "logo.png");
@@ -110,8 +122,8 @@ function results() {
   const shadow = () => ({ type: "outer", color: "0F2A33", opacity: 0.18, blur: 18, offset: 6, angle: 90 });
   const card = (s, name, x, y, w, h, dark = false) => s.addShape(pres.shapes.ROUNDED_RECTANGLE, {
     objectName: name, x, y, w, h, rectRadius: 0.22,
-    fill: dark ? { color: C.background1, transparency: 90 } : { color: C.background1, transparency: 12 },
-    line: dark ? { color: C.background1, transparency: 80, width: 0.75 } : { color: C.background1, width: 1 },
+    fill: dark ? { color: C.background1, transparency: 88 } : { color: C.background1, transparency: 35 },
+    line: dark ? { color: C.background1, transparency: 70, width: 1 } : { color: C.background1, width: 1.5 },
     shadow: dark ? undefined : shadow(),
   });
   const iconBubble = async (s, name, icon, x, y, d = 0.62, bg = C.accent1, fg = "FFFFFF") => {
@@ -128,8 +140,23 @@ function results() {
 
   const R = results();
 
+  // two glass spheres on every slide; Morph moves them between slides
+  const ORBS = [ // [ax, ay, ad, bx, by, bd] per slide (inches)
+    [10.6, -1.0, 3.6, 7.25, 6.25, 1.5], [11.6, 5.3, 2.6, -1.2, -0.9, 2.2], [12.1, 3.6, 1.9, 4.6, -1.3, 2.0],
+    [-1.1, 5.6, 2.6, 12.0, -0.8, 2.2], [6.2, 5.9, 2.4, 12.2, 0.8, 1.6], [12.0, 5.8, 2.2, -1.0, 2.6, 1.9],
+    [3.8, 6.1, 1.8, 11.9, -1.2, 2.4], [-1.2, -1.1, 3.0, 11.4, 5.6, 2.6], [12.2, -0.9, 2.2, 8.4, 6.3, 1.7],
+    [-1.0, 3.4, 2.2, 12.1, 5.9, 2.0], [10.9, -1.3, 3.8, 6.2, -1.0, 2.0],
+  ];
+  let slideNo = 0;
+  const orbs = (sl) => {
+    const [ax, ay, ad, bx, by, bd] = ORBS[slideNo++ % ORBS.length];
+    sl.addImage({ objectName: "!!orbA", path: path.join(ASSETS, "orb-a.png"), x: ax, y: ay, w: ad, h: ad });
+    sl.addImage({ objectName: "!!orbB", path: path.join(ASSETS, "orb-b.png"), x: bx, y: by, w: bd, h: bd });
+  };
+
   // =============================================================== 1. title
   let s = pres.addSlide({ masterName: "DARK_TITLE" });
+  orbs(s);
   s.addImage({ path: path.join(ASSETS, "ripples-dark.png"), x: 6.6, y: 2.1, w: 6.6, h: 6.6, transparency: 10 });
   s.addImage({ objectName: "anim_logo", path: LOGO, x: 0.8, y: 1.05, w: 1.05, h: 1.05 });
   s.addText("ChillDesk", { placeholder: "title" });
@@ -146,6 +173,7 @@ function results() {
 
   // =============================================================== 2. problem
   s = pres.addSlide({ masterName: "LIGHT_CONTENT" });
+  orbs(s);
   s.addText("Müştəri dəstəyi yavaş, baha və dağınıqdır", { placeholder: "title" });
   const probs = [
     ["LuClock", "Suallar 24/7 gəlir", "“Sifarişim haradadır?”, “pulum nə vaxt qayıdır?” — eyni suallar gecə-gündüz təkrarlanır, cavab növbədə gözləyir."],
@@ -164,6 +192,7 @@ function results() {
 
   // =============================================================== 3. solution
   s = pres.addSlide({ masterName: "LIGHT_CONTENT" });
+  orbs(s);
   s.addText("Tanış olun: Aysu", { placeholder: "title" });
   const feats = [
     ["LuMessageSquareText", "Chat + real hərəkət", "Gemma 4 function calling: sifarişi tapır, izləyir, qaytarma və bilet açır"],
@@ -186,6 +215,7 @@ function results() {
 
   // =============================================================== 4. photo demo
   s = pres.addSlide({ masterName: "LIGHT_CONTENT" });
+  orbs(s);
   s.addText("Şəkil göndər, həll al", { placeholder: "title" });
   await shot(s, "anim_photo", "damaged-headphones.jpg", 0.7, 1.7, 3.3);
   text(s, "anim_photocap", "Müştərinin göndərdiyi şəkil", { x: 0.7, y: 4.0, w: 3.3, h: 0.3, fontSize: 12, color: C.accent5, align: "center" });
@@ -208,6 +238,7 @@ function results() {
 
   // =============================================================== 5. voice
   s = pres.addSlide({ masterName: "DARK_CONTENT" });
+  orbs(s);
   s.addText("Zəng kimi: səsli Aysu", { placeholder: "title" });
   await shot(s, "anim_ring", "04-call-ringing.png", 0.75, 1.5, 2.85, true);
   await shot(s, "anim_live", "05-call-aysu.png", 3.85, 1.5, 3.25, true);
@@ -227,6 +258,7 @@ function results() {
 
   // =============================================================== 6. automation
   s = pres.addSlide({ masterName: "LIGHT_CONTENT" });
+  orbs(s);
   s.addText("Söhbət bitir, iş özü görülür", { placeholder: "title" });
   await shot(s, "anim_dash", "06-dashboard.jpg", 0.7, 1.55, 8.1);
   const outs = ["Xülasə", "Kateqoriya", "Təcililik", "Emosiya", "Həll olundu?", "İnsan lazımdır?", "Avto-bilet", "Follow-up email", "KB boşluğu"];
@@ -241,6 +273,7 @@ function results() {
 
   // =============================================================== 7. architecture
   s = pres.addSlide({ masterName: "LIGHT_CONTENT" });
+  orbs(s);
   s.addText("Arxitektura", { placeholder: "title" });
   const box = (name, label, sub, x, y, w, h, color) => {
     s.addShape(pres.shapes.ROUNDED_RECTANGLE, { objectName: name, x, y, w, h, rectRadius: 0.18, fill: { color: C.background1 }, line: { color, width: 1.75 }, shadow: shadow() });
@@ -263,6 +296,7 @@ function results() {
 
   // =============================================================== 8. fine-tuning method
   s = pres.addSlide({ masterName: "DARK_CONTENT" });
+  orbs(s);
   s.addText("Öz modelimizi öyrətdik: Unsloth QLoRA", { placeholder: "title" });
   const nTrain = R.log ? R.log.train_examples : 189;
   const nTest = (R.teacher || R.base || {}).n || 40;
@@ -289,6 +323,7 @@ function results() {
 
   // =============================================================== 9. results
   s = pres.addSlide({ masterName: "LIGHT_CONTENT" });
+  orbs(s);
   s.addText("Nəticə: kiçik model, böyük fərq", { placeholder: "title" });
   const fields = [["acc_category", "Kateqoriya"], ["acc_urgency", "Təcililik"], ["acc_sentiment", "Emosiya"], ["acc_resolved", "Həll olundu"], ["acc_needs_human", "İnsan lazım"], ["acc_team", "Komanda"]];
   const series = [["base", "Gemma 3 1B (base)"], ["finetuned", "Gemma 3 1B + LoRA (bizim)"], ["teacher", "Gemma 4 26B (API)"]].filter(([k]) => R[k]);
@@ -319,6 +354,7 @@ function results() {
 
   // =============================================================== 10. open source
   s = pres.addSlide({ masterName: "LIGHT_CONTENT" });
+  orbs(s);
   s.addText("Hamısı açıq", { placeholder: "title" });
   const oss = [
     ["LuSparkles", "Gemma 4 26B / E4B", "Agent, vision, analiz", "Apache 2.0"],
@@ -340,6 +376,7 @@ function results() {
 
   // =============================================================== 11. closing
   s = pres.addSlide({ masterName: "DARK_TITLE" });
+  orbs(s);
   s.addImage({ path: path.join(ASSETS, "ripples-dark.png"), x: 6.4, y: 1.6, w: 7, h: 7, transparency: 10 });
   s.addImage({ objectName: "anim_logo2", path: LOGO, x: 0.8, y: 1.05, w: 1.05, h: 1.05 });
   s.addText("Təşəkkürlər!", { placeholder: "title" });
