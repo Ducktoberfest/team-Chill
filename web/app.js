@@ -1,5 +1,9 @@
 // Səbət demo store + Aysu support widget (web chat over SSE, voice via ElevenLabs).
+import { AysuAvatar } from "./aysu-avatar.js?v=5";
+
 const $ = (s) => document.querySelector(s);
+let aysu = null;        // avatar in the support panel
+const avatarSrc = "/static/avatar/aysu.glb";
 const ICON = { P101: "headphones", P102: "smartphone", P103: "shield", P104: "laptop", P105: "refrigerator", P106: "coffee",
   P107: "bed-double", P108: "utensils", P109: "shirt", P110: "watch", P111: "bot", P112: "mouse" };
 const icon = (name) => `<i data-lucide="${name}"></i>`;
@@ -75,6 +79,7 @@ async function send(text) {
   const images = pendingImages; pendingImages = []; $("#preview").innerHTML = "";
   addMsg("user", text, images);
   $("#input").value = "";
+  aysu?.setState("thinking");
   const typing = addNote("Aysu yazır");
   try {
     const res = await fetch("/api/chat", {
@@ -96,17 +101,25 @@ async function send(text) {
         if (data === "[DONE]") continue;
         const ev = JSON.parse(data);
         if (ev.type === "conversation") conversationId = ev.id;
-        else if (ev.type === "tool") { addStep(ev); $("#messages").append(typing); }
-        else if (ev.type === "text") addMsg("bot", ev.text);
-        else if (ev.type === "error") addMsg("bot", "Xəta: " + ev.error);
+        else if (ev.type === "tool") { addStep(ev); $("#messages").append(typing); reactToTool(ev); }
+        else if (ev.type === "text") { addMsg("bot", ev.text); aysu?.speakText(ev.text.replace(/[*#_`]/g, "")); }
+        else if (ev.type === "error") { addMsg("bot", "Xəta: " + ev.error); aysu?.setEmotion("concerned"); aysu?.setState("idle"); }
       }
     }
   } catch (e) {
     addMsg("bot", "Bağlantı xətası: " + e.message);
+    aysu?.setEmotion("concerned"); aysu?.setState("idle");
   } finally {
     typing.remove();
     busy = false; $("#send").disabled = false;
   }
+}
+
+function reactToTool(ev) {
+  const r = ev.result || {};
+  if (ev.name === "create_return" && ["replacement", "refund"].includes(r.decision)) aysu?.setEmotion("happy", { durationMs: 4000 });
+  else if (ev.name === "create_return" && r.decision === "not_eligible") aysu?.setEmotion("empathetic", { durationMs: 4000 });
+  else if (ev.name === "create_ticket") aysu?.setEmotion("empathetic", { durationMs: 4000 });
 }
 
 async function endConversation(id) {
@@ -139,13 +152,26 @@ async function toggleCall() {
     voice = await Conversation.startSession({
       agentId: config.agent_id,
       connectionType: "webrtc",
+      textOnly: false,
       customLlmExtraBody: { conversation_id: voiceId, customer_id: $("#customer").value || null },
-      onConnect: () => { $("#voice-status").textContent = "Danışın, Aysu dinləyir"; },
-      onModeChange: ({ mode }) => { $("#voice-status").textContent = mode === "speaking" ? "Aysu danışır" : "Aysu dinləyir"; },
+      onConnect: () => {
+        $("#voice-status").textContent = "Danışın, Aysu dinləyir";
+        $("#panel").classList.add("calling");
+        setTimeout(() => aysu?.frame("bust"), 360);
+        aysu?.useFrequencySource(() => voice && voice.getOutputByteFrequencyData());
+        aysu?.setState("listening");
+      },
+      onModeChange: ({ mode }) => {
+        $("#voice-status").textContent = mode === "speaking" ? "Aysu danışır" : "Aysu dinləyir";
+        aysu?.setState(mode === "speaking" ? "speaking" : "listening");
+      },
       onMessage: ({ source, message }) => addMsg(source === "user" ? "user" : "bot", message),
       onError: (e) => addMsg("bot", "Səs xətası: " + (e?.message || e)),
       onDisconnect: () => {
         voice = null;
+        aysu?.stopAudio(); aysu?.setState("idle");
+        $("#panel").classList.remove("calling");
+        setTimeout(() => aysu?.frame("face"), 360);
         $("#voice-bar").classList.remove("on");
         $("#call").innerHTML = icon("phone"); paintIcons();
         endConversation(voiceId);
@@ -188,7 +214,21 @@ function renderProducts(cat) {
   paintIcons();
 }
 
-function openPanel() { $("#panel").classList.add("open"); $("#fab").style.display = "none"; $("#input").focus(); }
+function openPanel() {
+  $("#panel").classList.add("open"); $("#fab").style.display = "none"; $("#input").focus();
+  if (!aysu) {
+    aysu = new AysuAvatar($("#aysu-stage"), { src: avatarSrc, framing: "face" });
+    aysu.load().catch((e) => { console.warn("avatar", e); $("#aysu-stage").style.display = "none"; aysu = null; });
+  }
+}
+
+// large Aysu in the "Tanış ol" band, created when it scrolls into view
+new IntersectionObserver(([e], obs) => {
+  if (!e.isIntersecting) return;
+  obs.disconnect();
+  new AysuAvatar($("#aysu-hero"), { src: avatarSrc, framing: "bust" }).load()
+    .catch((err) => { console.warn("avatar", err); $("#aysu-hero").style.display = "none"; });
+}, { rootMargin: "200px" }).observe($("#aysu-hero"));
 
 $("#cats").addEventListener("click", (e) => {
   const b = e.target.closest(".cat-btn"); if (!b) return;
@@ -204,6 +244,7 @@ $("#band-aysu").onclick = openPanel;
 $("#fab").onclick = openPanel;
 $("#close").onclick = () => { $("#panel").classList.remove("open"); $("#fab").style.display = ""; };
 $("#send").onclick = () => send($("#input").value);
+$("#input").addEventListener("input", () => { if (!voice) aysu?.setState("listening"); });
 $("#input").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send($("#input").value); } });
 $("#chips").addEventListener("click", (e) => { if (e.target.classList.contains("chip")) send(e.target.textContent); });
 $("#file").addEventListener("change", async (e) => {

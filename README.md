@@ -15,6 +15,7 @@ The demo store is **Səbət**, a fictional Azerbaijani online shop. All customer
 | 📷 **Multimodal support** | The customer attaches a photo (a damaged product, an error screenshot, a receipt). Gemma 4 describes what it sees, decides, and stores its photo assessment with the return request. |
 | 📞 **Voice agent** | ElevenLabs Conversational AI handles speech-to-text and the voice. The **brain is still Gemma 4**: ElevenLabs calls our OpenAI-compatible `/v1/chat/completions` "Custom LLM" endpoint, which runs the same tool-calling agent. |
 | ⚡ **Post-conversation automation** | When a chat ends, or goes idle for 90 s (voice calls), Gemma 4 produces structured JSON: summary, category, urgency, sentiment, resolved/needs-human, action items, a follow-up email, and a knowledge-base gap. If a human is needed, it opens a ticket for the right team automatically. |
+| 🧑 **3D Aysu** | A Three.js avatar (`web/aysu-avatar.js`) lip-syncs to the ElevenLabs voice through its audio spectrum, and to chat replies letter by letter. It blinks, follows the pointer with its eyes, breathes, and shows listening, thinking, speaking and emotion states driven by agent events (a smile on an approved return, empathy on a ticket). |
 | 📊 **Ops dashboard** | `/dashboard` shows KPIs, every conversation with its AI analysis and follow-up email, tickets (agent- vs automation-created), returns with photo assessments, and questions the KB couldn't answer. |
 | 🔎 **RAG on open weights** | The store's policies are embedded with **EmbeddingGemma** (running locally in Ollama) and searched with **pgvector** in **Neon** Postgres. |
 
@@ -79,7 +80,7 @@ Open <http://localhost:8000> (store and agent) and <http://localhost:8000/dashbo
 
 ## Built during the event
 
-All code in this repository was written on 11 Oct 2026 during Ducktoberfest Baku. The git history shows the timeline. In line with MLH rules on AI tools: we used **Claude Code** as an AI coding assistant during the build.
+All code in this repository was written on 11 Oct 2026 during Ducktoberfest Baku. The git history shows the timeline. The one exception is the 3D avatar model file (`web/avatar/aysu.glb`): a team member made it before the event, and the organizers confirmed we may use it. The avatar code that animates it was written today. In line with MLH rules on AI tools: we used **Claude Code** as an AI coding assistant during the build.
 
 ## Credits
 

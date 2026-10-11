@@ -330,3 +330,14 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.9; flex: none; }
 .card .thumb { overflow: hidden; padding: 0; }
 .card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
 .card:hover .thumb img { transform: scale(1.05); }
+
+/* ---------- Aysu 3D ---------- */
+.stage { height: 190px; flex: none; position: relative; border-bottom: 1px solid var(--line);
+  background: radial-gradient(70% 90% at 50% 100%, rgba(94, 92, 230, .18), transparent 70%),
+              radial-gradient(60% 70% at 80% 10%, rgba(255, 55, 95, .10), transparent 70%); transition: height .35s ease; }
+.panel.calling .stage { height: 330px; }
+.stage canvas, .aysu-hero canvas { display: block; }
+.ai-side { display: grid; gap: 12px; }
+.aysu-hero { height: 300px; border-radius: 24px; overflow: hidden;
+  background: radial-gradient(70% 80% at 50% 100%, rgba(94, 92, 230, .45), transparent 70%), rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.12); }

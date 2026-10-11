@@ -6,8 +6,13 @@
   <title>Səbət · hər şey bir Səbətdə</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=3">
+  <link rel="stylesheet" href="/static/styles.css?v=4">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+  </script>
 </head>
 <body>
   <header class="topbar">
@@ -63,10 +68,13 @@
         <p>Aysu açıq çəkili Gemma 4 modeli ilə işləyir: sifarişini tapır, şəkli oxuyur, qaytarmanı dərhal açır, lazım olsa əməkdaşa ötürür. Yazılı və ya səsli, gecə-gündüz.</p>
         <button class="btn" id="band-aysu" style="margin-top:8px">Aysu ilə danış</button>
       </div>
+      <div class="ai-side">
+      <div id="aysu-hero" class="aysu-hero"></div>
       <div class="ai-feats">
         <div class="ai-feat"><span class="ic"><i data-lucide="camera"></i></span><div><b>Şəkil göndər, həll al</b><span>Zədəli məhsulun şəklini göndər, Aysu görür və dəyişdirməni açır.</span></div></div>
         <div class="ai-feat"><span class="ic"><i data-lucide="phone"></i></span><div><b>Səsli zəng</b><span>Azərbaycan, rus və ingilis dillərində təbii səs.</span></div></div>
         <div class="ai-feat"><span class="ic"><i data-lucide="zap"></i></span><div><b>Saniyələr içində</b><span>Sifariş statusu, çatdırılma, qaytarma, növbə gözləmədən.</span></div></div>
+      </div>
       </div>
     </section>
 
@@ -93,6 +101,7 @@
       <button id="end" class="icon-btn" title="Söhbəti bitir"><i data-lucide="check"></i></button>
       <button id="close" class="icon-btn" title="Bağla"><i data-lucide="x"></i></button>
     </div>
+    <div id="aysu-stage" class="stage"></div>
     <div id="voice-bar" class="voice-bar"><span class="pulse"></span><span id="voice-status">Zəng</span></div>
     <div id="messages" class="messages"></div>
     <div class="composer">
@@ -110,6 +119,6 @@
     </div>
   </section>
 
-  <script type="module" src="/static/app.js?v=3"></script>
+  <script type="module" src="/static/app.js?v=5"></script>
 </body>
 </html>
