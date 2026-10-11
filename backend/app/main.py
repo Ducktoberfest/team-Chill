@@ -10,7 +10,7 @@ import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi import FastAPI, File, Header, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -143,6 +143,38 @@ def _voice_key(body: dict) -> str:
     return "V-" + hashlib.sha1(json.dumps(first_user, default=str).encode()).hexdigest()[:10]
 
 
+# Natural "thinking" phrases for voice: chosen by what the customer said, not every turn, never the same twice in a row.
+FILLERS = {
+    "upset": ["Anlayıram, dərhal baxıram. ", "Haqlısınız, indi yoxlayıram. ", "Narahat olmayın, bir dəqiqə baxım. "],
+    "order": ["Aha, anladım. Bir dəqiqə, sifarişinizə baxıram. ", "Baxıram, bir saniyə. ", "Hmm, gəlin yoxlayaq. ",
+              "Bir dəqiqə, araşdırıram. ", "Aydındır, indi baxıram. "],
+    "rule": ["Yaxşı sual, bir saniyə. ", "Bir dəqiqə, qaydaya baxım. ", "Aha, bir saniyə yoxlayım. "],
+    "any": ["Aha, anladım. ", "Bir saniyə. ", "Hmm, baxım. ", "Yaxşı, bir dəqiqə. "],
+}
+_last_filler: dict[str, str] = {}
+
+
+def _filler(cid: str, text: str, force: bool = False) -> str | None:
+    import random
+    low = text.lower()
+    if any(w in low for w in ("bezdim", "əsəb", "hələ də", "niyə", "şikayət", "rəzalət", "pulumu")):
+        kind = "upset"
+    elif any(w in low for w in ("sifariş", "gəlir", "gələcək", "çatdır", "kuryer", "harada", "saat", "noutbuk", "gödəkçə", "ml-")):
+        kind = "order"
+    elif any(w in low for w in ("qaytar", "zəmanət", "pul", "kompensasiya", "endirim", "qayda", "necə")):
+        kind = "rule"
+    elif force:
+        kind = "any"
+    else:
+        return None  # greetings and small talk: answer directly
+    if not force and random.random() > 0.65:
+        return None
+    options = [f for f in FILLERS[kind] if f != _last_filler.get(cid)]
+    choice = random.choice(options)
+    _last_filler[cid] = choice
+    return choice
+
+
 def _chunk(cid: str, text: str | None, finish: str | None = None) -> str:
     return "data: " + json.dumps({"id": cid, "object": "chat.completion.chunk", "created": int(time.time()),
                                   "model": "gemma-4", "choices": [{"index": 0, "delta": {"content": text} if text else {},
@@ -163,15 +195,18 @@ async def custom_llm(request: Request, authorization: str | None = Header(defaul
     cid = "chatcmpl-" + uuid.uuid4().hex[:12]
 
     async def stream():
-        filler_sent = False
         events: list[dict] = []
+        early = _filler(s.conversation_id, text or "")
+        filler_sent = bool(early)
+        if early:
+            yield _chunk(cid, early)   # speak while Gemma thinks
         try:
             async for ev in agent.respond(s, history, {"role": "user", "content": text or "..."}):
                 if ev["type"] == "tool":
                     events.append(ev)
                 if ev["type"] == "tool" and not filler_sent:
                     filler_sent = True
-                    yield _chunk(cid, "Bir saniyə, yoxlayıram. ")
+                    yield _chunk(cid, _filler(s.conversation_id, text or "", force=True))
                 elif ev["type"] == "text":
                     yield _chunk(cid, ev["text"])
                     await asyncio.to_thread(_focus, s, text or "", events, ev["text"])
@@ -184,6 +219,33 @@ async def custom_llm(request: Request, authorization: str | None = Header(defaul
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(stream(), media_type="text/event-stream")
+
+
+STT_HINT = ("Azərbaycan dilində müştəri dəstəyi zəngi. Mallard onlayn mağazası, Aysu. Sözlər: sifariş, qaytarma, çatdırılma, kuryer, "
+            "zəmanət, kompensasiya, endirim, noutbuk, smart saat, gödəkçə, qulaqlıq, soyuducu, espresso, ML-2001, ML-2002, ML-2003.")
+
+
+@app.post("/api/stt")
+async def stt(audio: UploadFile = File(...)):
+    """Push-to-talk speech recognition with OpenAI gpt-transcribe (Azerbaijani hint + store vocabulary)."""
+    import httpx
+    if not config.OPENAI_API_KEY:
+        raise HTTPException(503, "OPENAI_API_KEY is not set")
+    data = await audio.read()
+    files = {"file": (audio.filename or "speech.webm", data, audio.content_type or "audio/webm")}
+    attempts = [{"model": config.STT_MODEL, "language": "az", "prompt": STT_HINT},
+                {"model": config.STT_MODEL, "language": "az"},
+                {"model": config.STT_MODEL}]
+    async with httpx.AsyncClient(timeout=40) as client:
+        for form in attempts:   # newer models may reject some fields; fall back to fewer
+            r = await client.post("https://api.openai.com/v1/audio/transcriptions",
+                                  headers={"Authorization": f"Bearer {config.OPENAI_API_KEY}"}, data=form, files=files)
+            if r.status_code < 400:
+                return {"text": r.json().get("text", "").strip(), "model": config.STT_MODEL}
+            log.warning("stt %s failed %s: %s", form.keys(), r.status_code, r.text[:200])
+            if r.status_code not in (400, 422):
+                break
+    raise HTTPException(502, f"transcription failed: {r.status_code}")
 
 
 @app.get("/api/voice/focus")
@@ -202,6 +264,7 @@ def voice_focus(cid: str = ""):
 def get_config():
     customers = db.query("SELECT id, name, city FROM customers ORDER BY id")
     return {"agent_id": config.ELEVENLABS_AGENT_ID, "model": llm.backend_label(), "embed_model": config.EMBED_MODEL,
+            "stt": config.STT_MODEL if config.OPENAI_API_KEY else None,
             "store": config.STORE_NAME, "agent": config.AGENT_NAME, "customers": customers}
 
 

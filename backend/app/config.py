@@ -27,6 +27,8 @@ EMBED_DIM = 768
 DATABASE_URL = env("DATABASE_URL")
 ELEVENLABS_AGENT_ID = env("ELEVENLABS_AGENT_ID")
 CUSTOM_LLM_SECRET = env("CUSTOM_LLM_SECRET")
+OPENAI_API_KEY = env("OPENAI_API_KEY")
+STT_MODEL = env("STT_MODEL", "gpt-transcribe")  # push-to-talk speech recognition for Azerbaijani
 
 STORE_NAME = "Mallard"
 AGENT_NAME = "Aysu"

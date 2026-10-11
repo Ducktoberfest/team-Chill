@@ -7,7 +7,7 @@
   <link rel="icon" href="/static/brand/mallard.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=13">
+  <link rel="stylesheet" href="/static/styles.css?v=15">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script type="importmap">
     { "imports": {
@@ -115,6 +115,9 @@
         <div class="rings"><span></span><span></span><span></span><div class="avatar big"></div></div>
       </div>
       <div class="call-info"><b>Aysu</b><span id="voice-status">Zəng edilir</span><span id="call-timer" class="timer"></span></div>
+      <button id="stt-toggle" class="stt-toggle" title="Nitqin tanınması" hidden>GPT STT</button>
+      <button id="ptt" class="ptt" title="Basıb saxla və danış (və ya Space)" hidden><i data-lucide="mic"></i></button>
+      <span id="ptt-hint" class="ptt-hint" hidden>Basıb saxla, danış</span>
       <button id="hangup" class="hangup" title="Zəngi bitir"><i data-lucide="phone-off"></i></button>
     </div>
     <div id="messages" class="messages"></div>
@@ -133,6 +136,6 @@
     </div>
   </section>
 
-  <script type="module" src="/static/app.js?v=13"></script>
+  <script type="module" src="/static/app.js?v=15"></script>
 </body>
 </html>

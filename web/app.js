@@ -231,6 +231,49 @@ function closeCallScreen() {
   setTimeout(() => { cs.hidden = true; cs.classList.remove("closing", "connected"); $("#call-timer").textContent = ""; }, 350);
 }
 
+// ---------------------------------------------------------------- push-to-talk with OpenAI gpt-transcribe
+let sttMode = false, micStream = null, recorder = null, chunks = [];
+function setSttMode(on) {
+  sttMode = on && !!config.stt;
+  voice?.setMicMuted(sttMode);
+  $("#ptt").hidden = !sttMode; $("#ptt-hint").hidden = !sttMode;
+  $("#stt-toggle").classList.toggle("on", sttMode);
+  $("#stt-toggle").textContent = sttMode ? "GPT STT" : "ElevenLabs STT";
+}
+async function pttStart() {
+  if (!sttMode || recorder) return;
+  try {
+    micStream = micStream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    chunks = [];
+    recorder = new MediaRecorder(micStream);
+    recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    recorder.start();
+    $("#ptt").classList.add("rec"); $("#ptt-hint").textContent = "Dinləyirəm… burax";
+    aysu?.setState("listening");
+  } catch (e) { addMsg("bot", "Mikrofona icazə lazımdır: " + e.message); }
+}
+async function pttStop() {
+  if (!recorder) return;
+  const rec = recorder; recorder = null;
+  $("#ptt").classList.remove("rec"); $("#ptt-hint").textContent = "Tanınır…";
+  await new Promise((r) => { rec.onstop = r; rec.stop(); });
+  const blob = new Blob(chunks, { type: rec.mimeType || "audio/webm" });
+  if (blob.size < 2500) { $("#ptt-hint").textContent = "Basıb saxla, danış"; return; }   // a tap, not speech
+  const fd = new FormData(); fd.append("audio", blob, "speech.webm");
+  const r = await fetch("/api/stt", { method: "POST", body: fd }).then((x) => x.json()).catch(() => ({}));
+  $("#ptt-hint").textContent = "Basıb saxla, danış";
+  const text = (r.text || "").trim();
+  if (!text) return;
+  addMsg("user", text);
+  reactToTone("user", text);
+  voice?.sendUserMessage(text);
+}
+$("#ptt").addEventListener("pointerdown", (e) => { e.preventDefault(); pttStart(); });
+["pointerup", "pointerleave", "pointercancel"].forEach((t) => $("#ptt").addEventListener(t, pttStop));
+document.addEventListener("keydown", (e) => { if (e.code === "Space" && sttMode && voice && !e.repeat && document.activeElement?.tagName !== "TEXTAREA") { e.preventDefault(); pttStart(); } });
+document.addEventListener("keyup", (e) => { if (e.code === "Space" && sttMode && voice) { e.preventDefault(); pttStop(); } });
+$("#stt-toggle").onclick = () => setSttMode(!sttMode);
+
 let calling = false;
 let cancelCall = null;   // set while ringing; hanging up before Aysu answers cancels the call
 async function toggleCall() {
@@ -278,6 +321,8 @@ async function toggleCall() {
         aysu?.useFrequencySource(() => voice && voice.getOutputByteFrequencyData());
         aysu?.setState("listening");
         pollFocus(voiceId);
+        $("#stt-toggle").hidden = !config.stt;
+        setTimeout(() => setSttMode(!!config.stt), 300);   // gpt-transcribe by default when available
       },
       onModeChange: ({ mode }) => {
         setCallStatus(mode === "speaking" ? "Aysu danışır" : "Aysu dinləyir");
@@ -293,6 +338,8 @@ async function toggleCall() {
       onDisconnect: () => {
         voice = null; calling = false; cancelCall = null;
         clearInterval(focusTimer);
+        setSttMode(false); $("#stt-toggle").hidden = true;
+        micStream?.getTracks().forEach((t) => t.stop()); micStream = null;
         stopRingOnce();
         aysu?.stopAudio(); aysu?.setState("idle");
         closeCallScreen();
