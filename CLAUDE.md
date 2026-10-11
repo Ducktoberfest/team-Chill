@@ -35,10 +35,14 @@ Repo: https://github.com/Ducktoberfest/team-Chill (public, was empty at start). 
 - Value-add: (a) multimodal: customer sends a screenshot/photo and Gemma 4 reads it; (b) post-conversation automation: Gemma summarizes, classifies category/urgency/sentiment, opens a ticket, drafts a follow-up email, saves to Neon and shows it on the dashboard.
 - Fresh UI style. LICENSE: MIT or Apache-2.0.
 
-## Status
-- [x] Read the event, track and promo pages (11:20)
-- [x] Idea chosen (11:50); decided to build from scratch (11:55)
-- [ ] Gemma 4 tool-calling smoke test → LLM swap → new business domain → Neon → automation + multimodal → restyle → README/LICENSE → push → MLH submission (both categories)
+## Status (13:50)
+- Built from scratch: ChillDesk (FastAPI + Gemma 4 26B MoE on the Gemini API + Neon/pgvector + EmbeddingGemma via Ollama + ElevenLabs voice). The store brand is **Mallard** (duck theme); the agent is Aysu.
+- Run: `cd backend && .venv/bin/uvicorn app.main:app --port 8000 --reload --reload-dir app`; tunnel: `cloudflared tunnel --url http://127.0.0.1:8000`, then put `<url>/v1` into the ElevenLabs agent's Custom LLM Server URL. The quick-tunnel URL changes on every restart.
+- ElevenLabs agent agent_9701m4n0fvv3fxfvp13knx1xcdqm: voice Gunel, Azerbaijani only, ASR keywords, background filter, extra body ON.
+- Gemma 4 26B on the Gemini API accepts thinking_level only `minimal` or `high` (low/medium give 400). JSON-schema mode is very slow for long outputs.
+- The 3D model web/avatar/aysu.glb is a pre-existing team asset, used with the organizers' OK (noted in the README, not in the UI).
+- In progress: Unsloth QLoRA of Gemma 4 E2B on the analyst task (training/): gen_data.py → train.py → eval_local.py (base vs finetuned) + eval_teacher.py → report for the slides.
+- TODO: MLH submission (both categories), DEV post, slides.
 
 ## User preferences
 - Ali writes in Azerbaijani, so reply in Azerbaijani.
