@@ -321,7 +321,7 @@ async function toggleCall() {
         aysu?.useFrequencySource(() => voice && voice.getOutputByteFrequencyData());
         aysu?.setState("listening");
         pollFocus(voiceId);
-        $("#stt-toggle").hidden = !config.stt;
+        $("#stt-toggle").hidden = true;   // gpt-transcribe stays on; no toggle on screen
         setTimeout(() => setSttMode(!!config.stt), 300);   // gpt-transcribe by default when available
       },
       onModeChange: ({ mode }) => {
