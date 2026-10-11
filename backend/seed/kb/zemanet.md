@@ -7,4 +7,4 @@ Elektronikaya 12–24 ay, böyük məişət texnikasına 24–36 ay zəmanət ve
 Mexaniki zədə (düşmə, sınıq ekran), maye təsiri, icazəsiz təmir və təbii köhnəlmə zəmanətə daxil deyil. Bu hallarda ödənişli təmir təklif olunur.
 
 ## Servis mərkəzi
-Səbət Servis Mərkəzi: Bakı, Xətai r., Babək pr. 12. İş saatları: B.e.–Şənbə 10:00–19:00. Bakı daxilində məhsul kuryerlə pulsuz götürülür.
+Mallard Servis Mərkəzi: Bakı, Xətai r., Babək pr. 12. İş saatları: B.e.–Şənbə 10:00–19:00. Bakı daxilində məhsul kuryerlə pulsuz götürülür.

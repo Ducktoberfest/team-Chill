@@ -30,8 +30,8 @@ TOOLS = [
         {"phone": {"type": "string", "description": "Telefon nömrəsi, məs. 0501234567 və ya +994501234567"}}, ["phone"]),
     _fn("list_orders", "Tanınmış müştərinin bütün sifarişləri (status, məbləğ, tarix).", {}, []),
     _fn("get_order", "Bir sifarişin tam detalları: məhsullar, kuryer, izləmə nömrəsi, çatdırılma tarixçəsi.",
-        {"order_id": {"type": "string", "description": "məs. SB-1042"}}, ["order_id"]),
-    _fn("search_knowledge", "Səbət-in qaydaları və FAQ-da axtarış (çatdırılma, qaytarma, zəmanət, ödəniş). "
+        {"order_id": {"type": "string", "description": "məs. ML-1042"}}, ["order_id"]),
+    _fn("search_knowledge", "Mallard-ın qaydaları və FAQ-da axtarış (çatdırılma, qaytarma, zəmanət, ödəniş). "
         "Qayda haqqında danışmazdan əvvəl HƏMİŞƏ istifadə et.",
         {"query": {"type": "string"}}, ["query"]),
     _fn("search_products", "Kataloqda məhsul axtar (ad və ya kateqoriya üzrə), qiymət və stokla.",

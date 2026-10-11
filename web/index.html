@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Səbət · hər şey bir Səbətdə</title>
+  <title>Mallard · sevdiyin hər şey</title>
+  <link rel="icon" href="/static/brand/mallard.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=6">
+  <link rel="stylesheet" href="/static/styles.css?v=7">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script type="importmap">
     { "imports": {
@@ -16,7 +17,7 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="logo"><span class="logo-mark"><i data-lucide="shopping-bag"></i></span> Səbət</div>
+    <div class="logo"><span class="logo-mark"><img src="/static/brand/mallard.svg" alt=""></span> Mallard</div>
     <nav class="nav-links">
       <a href="#products">Məhsullar</a>
       <a href="#aysu">Dəstək</a>
@@ -34,15 +35,17 @@
   <main class="page">
     <section class="hero glass">
       <div>
+        <div class="duck-badge"><img src="/static/brand/mallard.svg" alt="">Ducktoberfest seçimi</div>
         <div class="eyebrow">Yeni · Nova X12</div>
-        <h1>Sevdiyin hər şey.<br><span>Bir Səbətdə.</span></h1>
-        <p>Elektronika, ev və geyim. Bakıda 1–2 günə pulsuz çatdırılma, 14 günlük asan qaytarma. Sualın olsa, Aysu gecə-gündüz yazılı və səsli cavab verir.</p>
+        <h1>Sevdiyin hər şey.<br><span>Mallard-da.</span></h1>
+        <p>Elektronika, ev və geyim, suyun üzü kimi sakit alış-veriş. Bakıda 1–2 günə pulsuz çatdırılma, 14 günlük asan qaytarma. Sualın olsa, Aysu gecə-gündüz yazılı və səsli cavab verir.</p>
         <div class="ctas">
           <a class="btn" href="#products">Alış-verişə başla</a>
           <button class="btn ghost" id="hero-aysu"><i data-lucide="sparkles"></i> Aysu ilə danış</button>
         </div>
       </div>
       <div class="hero-visual">
+        <div class="ripples"><i></i><i></i><i></i></div>
         <div class="phone"><div class="screen"><div class="island"></div></div></div>
         <div class="tag-price">Nova X12 256GB<b>1 149 ₼ · 0% 12 ay</b></div>
       </div>
@@ -84,16 +87,16 @@
   </main>
 
   <footer>
-    <span>© 2026 Səbət. Fiktiv demo mağaza, bütün məlumatlar sintetikdir.</span>
+    <span class="duck"><img src="/static/brand/mallard.svg" alt="">© 2026 Mallard. Fiktiv demo mağaza, bütün məlumatlar sintetikdir.</span>
     <span>ChillDesk · Gemma 4 · EmbeddingGemma · Neon · ElevenLabs</span>
   </footer>
 
-  <button id="fab" class="fab"><span class="avatar">A</span><span>Aysu ilə danış</span></button>
+  <button id="fab" class="fab"><span class="avatar"></span><span>Aysu ilə danış</span></button>
 
   <section id="panel" class="panel" aria-label="Dəstək">
     <div class="panel-head">
-      <div class="avatar">A</div>
-      <div class="who"><b>Aysu</b> · Səbət dəstək<br><small id="model-label">Gemma 4</small></div>
+      <div class="avatar"></div>
+      <div class="who"><b>Aysu</b> · Mallard dəstək<br><small id="model-label">Gemma 4</small></div>
       <button id="call" class="icon-btn" title="Səsli zəng"><i data-lucide="phone"></i></button>
       <button id="end" class="icon-btn" title="Söhbəti bitir"><i data-lucide="check"></i></button>
       <button id="close" class="icon-btn" title="Bağla"><i data-lucide="x"></i></button>
@@ -101,7 +104,7 @@
     <div id="call-screen" class="call-screen" hidden>
       <div id="aysu-stage" class="stage"></div>
       <div class="ringer">
-        <div class="rings"><span></span><span></span><span></span><div class="avatar big">A</div></div>
+        <div class="rings"><span></span><span></span><span></span><div class="avatar big"></div></div>
       </div>
       <div class="call-info"><b>Aysu</b><span id="voice-status">Zəng edilir</span><span id="call-timer" class="timer"></span></div>
       <button id="hangup" class="hangup" title="Zəngi bitir"><i data-lucide="phone-off"></i></button>
@@ -122,6 +125,6 @@
     </div>
   </section>
 
-  <script type="module" src="/static/app.js?v=6"></script>
+  <script type="module" src="/static/app.js?v=7"></script>
 </body>
 </html>

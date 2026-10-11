@@ -1,4 +1,4 @@
-// Səbət demo store + Aysu support widget (web chat over SSE, voice via ElevenLabs).
+// Mallard demo store + Aysu support widget (web chat over SSE, voice via ElevenLabs).
 import { AysuAvatar } from "./aysu-avatar.js?v=5";
 
 const $ = (s) => document.querySelector(s);
@@ -246,7 +246,7 @@ async function boot() {
   const cats = ["Hamısı", ...new Set(products.map((p) => p.category))];
   $("#cats").innerHTML = cats.map((c, i) => `<button class="cat-btn${i ? "" : " on"}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
   renderProducts("Hamısı");
-  addMsg("bot", "Salam! Mən Aysu, Səbət-in dəstək agentiyəm. Sifariş, çatdırılma, qaytarma: nə lazımdırsa yazın. Zədəli məhsulun şəklini də göndərə bilərsiniz.");
+  addMsg("bot", "Salam! Mən Aysu, Mallard-ın dəstək agentiyəm. Sifariş, çatdırılma, qaytarma: nə lazımdırsa yazın. Zədəli məhsulun şəklini də göndərə bilərsiniz.");
   paintIcons();
 }
 
@@ -261,7 +261,7 @@ function renderProducts(cat) {
       <div class="row">
         <div><div class="price">${p.price.toLocaleString("az-AZ", { minimumFractionDigits: 0 })} ₼</div>
           <div class="stock${p.stock < 8 ? " low" : ""}">${p.stock < 8 ? `Son ${p.stock} ədəd` : "Stokda var"}</div></div>
-        <button class="add" title="Səbətə at">${icon("plus")}</button>
+        <button class="add" title="Mallardə at">${icon("plus")}</button>
       </div>
     </article>`).join("");
   paintIcons();

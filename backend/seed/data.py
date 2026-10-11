@@ -1,4 +1,4 @@
-"""Synthetic demo data for the fictional store "Səbət". Dates are relative to load time."""
+"""Synthetic demo data for the fictional store "Mallard". Dates are relative to load time."""
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
@@ -37,26 +37,26 @@ PRODUCTS = [
 
 # id, customer, status, payment, courier, tracking, address, created, eta, delivered, items[(pid, qty)], timeline
 ORDERS = [
-    ("SB-1042", "C001", "delivered", "Kart (Visa •• 4821)", "Səbət Express", "SE-77120458", "Bakı, Nərimanov r., Ə. Rəcəbli 12, m. 34",
+    ("ML-1042", "C001", "delivered", "Kart (Visa •• 4821)", "Mallard Express", "ME-77120458", "Bakı, Nərimanov r., Ə. Rəcəbli 12, m. 34",
      ago(6, 11), ago(3).date(), ago(3, 15), [("P101", 1), ("P103", 1)],
      [("sifariş qəbul edildi", ago(6, 11)), ("anbardan çıxdı", ago(5, 9)), ("kuryerdə", ago(3, 10)), ("çatdırıldı", ago(3, 15))]),
-    ("SB-1051", "C002", "delayed", "Kart (Mastercard •• 1190)", "AzKargo", "AK-5530217", "Sumqayıt, 9-cu mkr., ev 21, m. 8",
+    ("ML-1051", "C002", "delayed", "Kart (Mastercard •• 1190)", "AzKargo", "AK-5530217", "Sumqayıt, 9-cu mkr., ev 21, m. 8",
      ago(9, 14), ago(2).date(), None, [("P105", 1)],
      [("sifariş qəbul edildi", ago(9, 14)), ("anbardan çıxdı", ago(7, 10)),
       ("gecikmə: kuryer anbarında yüklənmə növbəsi", ago(2, 18))]),
-    ("SB-1057", "C003", "out_for_delivery", "Qapıda nağd", "Səbət Express", "SE-77131902", "Bakı, Yasamal r., Ş. Mehdiyev 45, m. 17",
+    ("ML-1057", "C003", "out_for_delivery", "Qapıda nağd", "Mallard Express", "ME-77131902", "Bakı, Yasamal r., Ş. Mehdiyev 45, m. 17",
      ago(2, 16), NOW.date(), None, [("P106", 1), ("P108", 1)],
      [("sifariş qəbul edildi", ago(2, 16)), ("anbardan çıxdı", ago(1, 9)), ("kuryerdə, bu gün 14:00–18:00", ago(0, 9))]),
-    ("SB-1033", "C003", "delivered", "Kart (Visa •• 7702)", "Səbət Express", "SE-77098311", "Bakı, Yasamal r., Ş. Mehdiyev 45, m. 17",
+    ("ML-1033", "C003", "delivered", "Kart (Visa •• 7702)", "Mallard Express", "ME-77098311", "Bakı, Yasamal r., Ş. Mehdiyev 45, m. 17",
      ago(24, 10), ago(20).date(), ago(20, 13), [("P109", 1)],
      [("sifariş qəbul edildi", ago(24, 10)), ("çatdırıldı", ago(20, 13))]),
-    ("SB-1060", "C004", "processing", "Kart (Visa •• 3345)", None, None, "Gəncə, Atatürk pr. 88, m. 3",
+    ("ML-1060", "C004", "processing", "Kart (Visa •• 3345)", None, None, "Gəncə, Atatürk pr. 88, m. 3",
      ago(1, 20), (NOW + timedelta(days=3)).date(), None, [("P110", 1), ("P112", 1)],
      [("sifariş qəbul edildi", ago(1, 20)), ("ödəniş təsdiqləndi", ago(1, 20))]),
-    ("SB-1048", "C005", "delivered", "Hissə-hissə (BirKart, 6 ay)", "AzKargo", "AK-5521876", "Bakı, Xətai r., Babək pr. 30, m. 61",
+    ("ML-1048", "C005", "delivered", "Hissə-hissə (BirKart, 6 ay)", "AzKargo", "AK-5521876", "Bakı, Xətai r., Babək pr. 30, m. 61",
      ago(44, 12), ago(40).date(), ago(40, 16), [("P104", 1)],
      [("sifariş qəbul edildi", ago(44, 12)), ("çatdırıldı", ago(40, 16))]),
-    ("SB-1055", "C001", "shipped", "Kart (Visa •• 4821)", "AzKargo", "AK-5537764", "Bakı, Nərimanov r., Ə. Rəcəbli 12, m. 34",
+    ("ML-1055", "C001", "shipped", "Kart (Visa •• 4821)", "AzKargo", "AK-5537764", "Bakı, Nərimanov r., Ə. Rəcəbli 12, m. 34",
      ago(2, 9), (NOW + timedelta(days=1)).date(), None, [("P107", 2)],
      [("sifariş qəbul edildi", ago(2, 9)), ("anbardan çıxdı", ago(1, 12))]),
 ]

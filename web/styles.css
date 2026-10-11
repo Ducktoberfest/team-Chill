@@ -1,17 +1,19 @@
-/* Apple-style glass UI for Səbət (store) and ChillDesk (dashboard) */
+/* Mallard store + ChillDesk dashboard: Apple-style glass, mallard-duck palette
+   (emerald head, teal sheen, orange beak, cream body, pond navy) */
 :root {
-  --bg: #f2f3f7;
-  --ink: #1d1d1f;
-  --muted: #6e6e73;
+  --bg: #f6f2ea;
+  --ink: #10242b;
+  --muted: #5f6d6b;
   --line: rgba(0, 0, 0, .08);
   --glass: rgba(255, 255, 255, .58);
   --glass-strong: rgba(255, 255, 255, .78);
   --glass-border: rgba(255, 255, 255, .7);
-  --brand: #0a84ff;
-  --brand-2: #5e5ce6;
-  --brand-soft: rgba(10, 132, 255, .12);
-  --accent: #ff375f;
-  --accent-soft: rgba(255, 55, 95, .12);
+  --brand: #0b7a5c;
+  --brand-2: #14b8a6;
+  --brand-soft: rgba(11, 122, 92, .12);
+  --accent: #f97316;
+  --accent-soft: rgba(249, 115, 22, .14);
+  --pond: #0f2a33;
   --ok: #248a3d; --ok-soft: rgba(52, 199, 89, .16);
   --warn: #b25000; --warn-soft: rgba(255, 159, 10, .18);
   --bad: #d70015; --bad-soft: rgba(255, 59, 48, .14);
@@ -35,10 +37,10 @@ body {
 body::before {
   content: ""; position: fixed; inset: -20%; z-index: -1;
   background:
-    radial-gradient(40% 35% at 15% 20%, rgba(94, 92, 230, .35), transparent 70%),
-    radial-gradient(35% 30% at 85% 15%, rgba(10, 132, 255, .32), transparent 70%),
-    radial-gradient(40% 40% at 70% 85%, rgba(255, 55, 95, .22), transparent 70%),
-    radial-gradient(35% 35% at 20% 90%, rgba(48, 209, 88, .18), transparent 70%);
+    radial-gradient(40% 35% at 12% 18%, rgba(22, 199, 154, .30), transparent 70%),
+    radial-gradient(35% 30% at 88% 12%, rgba(20, 184, 166, .26), transparent 70%),
+    radial-gradient(40% 40% at 72% 88%, rgba(249, 115, 22, .20), transparent 70%),
+    radial-gradient(35% 35% at 18% 92%, rgba(15, 42, 51, .14), transparent 70%);
   filter: blur(20px);
   animation: drift 24s ease-in-out infinite alternate;
 }
@@ -67,8 +69,9 @@ h1, h2, h3 { letter-spacing: -.025em; margin: 0; }
 .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
 .logo-mark {
   width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
-  background: linear-gradient(135deg, var(--brand), var(--brand-2)); color: #fff; font-size: 15px;
+  overflow: hidden; background: var(--pond);
 }
+.logo-mark img { width: 100%; height: 100%; display: block; }
 .nav-links { display: flex; gap: 18px; font-size: 14px; color: var(--muted); }
 .nav-links a { color: inherit; text-decoration: none; }
 .nav-links a:hover { color: var(--ink); }
@@ -91,7 +94,7 @@ h1, h2, h3 { letter-spacing: -.025em; margin: 0; }
   background: var(--brand); color: #fff; transition: transform .15s, box-shadow .15s, opacity .15s;
   display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
 }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(10, 132, 255, .3); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(11, 122, 92, .3); }
 .btn.ghost { background: rgba(255, 255, 255, .7); color: var(--ink); border: 1px solid var(--line); }
 .btn.ghost:hover { box-shadow: 0 8px 20px rgba(0, 0, 0, .08); }
 .btn.dark { background: var(--ink); }
@@ -106,7 +109,7 @@ h1, h2, h3 { letter-spacing: -.025em; margin: 0; }
 }
 .eyebrow { font-size: 13px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: .08em; }
 .hero h1 { font-size: clamp(38px, 6vw, 68px); line-height: 1.02; margin: 10px 0 14px; font-weight: 800; }
-.hero h1 span { background: linear-gradient(90deg, var(--brand), var(--brand-2), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero h1 span { background: linear-gradient(90deg, var(--brand), var(--brand-2) 55%, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .hero p { color: var(--muted); font-size: clamp(16px, 1.6vw, 19px); max-width: 520px; margin: 0 0 24px; }
 .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; }
 .hero-visual {
@@ -159,7 +162,7 @@ h1, h2, h3 { letter-spacing: -.025em; margin: 0; }
 .ai-band {
   margin: 64px 0 0; padding: clamp(28px, 5vw, 56px); border-radius: 36px;
   display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;
-  background: linear-gradient(135deg, rgba(29,29,31,.92), rgba(44,44,80,.9));
+  background: linear-gradient(135deg, rgba(15,42,51,.96), rgba(11,79,74,.92));
   color: #f5f5f7; box-shadow: var(--shadow);
 }
 .ai-band h2 { font-size: clamp(28px, 3.6vw, 44px); font-weight: 800; }
@@ -201,7 +204,7 @@ footer { margin: 64px auto 32px; width: min(1180px, calc(100% - 32px)); color: v
 .panel-head { display: flex; align-items: center; gap: 12px; padding: 14px 14px 12px 16px; border-bottom: 1px solid var(--line); }
 .avatar {
   width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; flex: none;
-  background: linear-gradient(135deg, var(--brand), var(--brand-2) 60%, var(--accent)); color: #fff; font-weight: 700;
+  background: var(--pond) url("/static/brand/mallard.svg") center / cover; color: transparent; font-weight: 700;
 }
 .panel-head .who { flex: 1; line-height: 1.25; }
 .panel-head .who small { color: var(--muted); font-size: 11.5px; }
@@ -320,9 +323,9 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.9; flex: none; }
 }
 .phone .screen {
   width: 100%; height: 100%; border-radius: 15% / 7%; position: relative; overflow: hidden;
-  background: radial-gradient(60% 45% at 30% 25%, #5e5ce6, transparent 70%),
-              radial-gradient(60% 50% at 80% 75%, #ff375f, transparent 70%),
-              linear-gradient(160deg, #0a84ff, #1d1d6b);
+  background: radial-gradient(60% 45% at 30% 25%, #16c79a, transparent 70%),
+              radial-gradient(60% 50% at 80% 78%, #f97316, transparent 70%),
+              linear-gradient(160deg, #0b7a5c, #0f2a33);
 }
 .phone .island { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); width: 34%; height: 4%; border-radius: 999px; background: #000; }
 @keyframes float { 50% { transform: rotate(-6deg) translateY(-12px); } }
@@ -334,9 +337,9 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.9; flex: none; }
 /* ---------- voice call screen ---------- */
 .call-screen { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center;
   color: #fff; overflow: hidden; animation: callIn .45s cubic-bezier(.2, .8, .2, 1);
-  background: radial-gradient(80% 60% at 50% 30%, rgba(94, 92, 230, .55), transparent 70%),
-              radial-gradient(70% 50% at 50% 100%, rgba(255, 55, 95, .35), transparent 70%),
-              linear-gradient(180deg, #14142b, #1d1d3a 60%, #24152b); }
+  background: radial-gradient(80% 60% at 50% 30%, rgba(22, 199, 154, .45), transparent 70%),
+              radial-gradient(70% 50% at 50% 100%, rgba(249, 115, 22, .30), transparent 70%),
+              linear-gradient(180deg, #0b1f26, #0f2a33 60%, #102b2a); }
 .call-screen[hidden] { display: none; }
 @keyframes callIn { from { opacity: 0; transform: scale(1.04); } }
 .call-screen.closing { animation: callOut .35s ease forwards; }
@@ -352,7 +355,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.9; flex: none; }
 .rings span:nth-child(2) { animation-delay: .8s; }
 .rings span:nth-child(3) { animation-delay: 1.6s; }
 @keyframes ring { from { transform: scale(.9); opacity: .9; } to { transform: scale(2.1); opacity: 0; } }
-.avatar.big { width: 110px; height: 110px; font-size: 42px; position: relative; box-shadow: 0 20px 60px rgba(94, 92, 230, .6);
+.avatar.big { width: 110px; height: 110px; font-size: 42px; position: relative; box-shadow: 0 20px 60px rgba(22, 199, 154, .45);
   animation: breathe 2.4s ease-in-out infinite; }
 @keyframes breathe { 50% { transform: scale(1.04); } }
 .call-info { position: absolute; bottom: 92px; left: 0; right: 0; display: grid; justify-items: center; gap: 2px; text-align: center; }
@@ -365,3 +368,21 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.9; flex: none; }
 .hangup:hover { transform: scale(1.06); }
 .hangup svg.lucide { width: 24px; height: 24px; }
 .panel .call-screen { border-radius: 28px; }
+
+/* ---------- pond ripples behind the hero product ---------- */
+.hero-visual { background: radial-gradient(80% 70% at 50% 60%, rgba(20,184,166,.18), transparent 70%), linear-gradient(160deg, rgba(255,255,255,.9), rgba(255,255,255,.35)); }
+.ripples { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.ripples i { position: absolute; width: 40%; aspect-ratio: 2.4; border-radius: 50%; border: 1.5px solid rgba(11,122,92,.28);
+  top: 72%; animation: ripple 5s ease-out infinite; }
+.ripples i:nth-child(2) { animation-delay: 1.66s; } .ripples i:nth-child(3) { animation-delay: 3.33s; }
+@keyframes ripple { from { transform: scale(.4); opacity: .9; } to { transform: scale(2.2); opacity: 0; } }
+.phone { position: relative; z-index: 1; }
+.duck-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  background: rgba(255,255,255,.7); border: 1px solid var(--line); color: var(--ink); margin-bottom: 6px; }
+.duck-badge img { width: 22px; height: 22px; border-radius: 7px; }
+.eyebrow { color: var(--accent); }
+.trust .ic svg.lucide { color: var(--brand); }
+.review .stars::before { background: linear-gradient(90deg, var(--accent) 100%, transparent 0); }
+.review .stars[data-n="4"]::before { background: linear-gradient(90deg, var(--accent) 80%, rgba(0,0,0,.15) 80%); }
+footer .duck { display: inline-flex; align-items: center; gap: 8px; }
+footer .duck img { width: 20px; height: 20px; border-radius: 6px; }

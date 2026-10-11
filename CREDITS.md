@@ -1,6 +1,6 @@
 # Product image credits
 
-Product photos on the Səbət demo store are openly licensed images found via [Openverse](https://openverse.org).
+Product photos on the Mallard demo store are openly licensed images found via [Openverse](https://openverse.org).
 They are resized to 800px. The products and brand names in the store are fictional.
 
 | Product | Image | Author | License | Source |
