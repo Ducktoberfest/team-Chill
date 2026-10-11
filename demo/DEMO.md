@@ -12,7 +12,7 @@ Yan tabda `localhost:8000/dashboard` açıq qalsın.
 ---
 
 ## 1 · Çatlı smart saat → şəkil → pulsuz dəyişmə  (≈15 s)
-📎 ilə bu şəkli yüklə: **`demo/cracked-watch.jpg`**, sonra yaz:
+Sancaq (attach) düyməsi ilə bu şəkli yüklə: **`demo/cracked-watch.jpg`**, sonra yaz:
 
 > Salam, smart saatım gəlib amma ekranı çatlıdır, şəkli göndərirəm. Dəyişmək istəyirəm.
 
@@ -41,5 +41,5 @@ Gözlənilən: `create_return` → **refund**, kartla ödəniş üçün **3–5 
 Söhbəti ✓ ilə bağla (və ya 10 saniyə gözlə) → dashboard: xülasə, kateqoriya, təcililik, emosiya, avto-bilet, hazır **follow-up email**.
 
 ## Bonus · Səsli zəng
-📞 → "duut… duut" → Aysu qoşulur. De: *"Salam, mənim nömrəm sıfır yetmiş, yeddi yüz altmış bir, altmış iki, səksən səkkiz. Noutbukum nə vaxt gələcək?"*
+Zəng düyməsi → "duut… duut" → Aysu qoşulur. De: *"Salam, mənim nömrəm sıfır yetmiş, yeddi yüz altmış bir, altmış iki, səksən səkkiz. Noutbukum nə vaxt gələcək?"*
 (Səs STT-si zalda səs-küydən təsirlənə bilər — əsas demo chat-dir.)
