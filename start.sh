@@ -29,6 +29,13 @@ else
   curl -s -o /dev/null localhost:8000/api/config && ok "Backend started on :8000" || { fail "Backend did not start (see .run/backend.log)"; }
 fi
 
+# 2b. Local analyst: our fine-tuned Gemma 3 1B + LoRA on the GPU (optional; the cloud analysis covers everything without it)
+if curl -s -m 2 localhost:8001/health | grep -q true; then ok "Local 1B analyst is running on :8001"
+elif [ -x training/.venv/bin/uvicorn ]; then
+  ( cd training && HF_HUB_OFFLINE=1 setsid nohup .venv/bin/uvicorn serve_analyst:app --host 127.0.0.1 --port 8001 >"$LOGS/analyst.log" 2>&1 < /dev/null & )
+  warn "Local 1B analyst is loading on :8001 (about 30 s)"
+fi
+
 # 3. Public tunnel for the ElevenLabs Custom LLM
 URL=""
 if pgrep -f "cloudflared tunnel --url http://127.0.0.1:8000" >/dev/null; then

@@ -28,7 +28,9 @@ DATABASE_URL = env("DATABASE_URL")
 ELEVENLABS_AGENT_ID = env("ELEVENLABS_AGENT_ID")
 CUSTOM_LLM_SECRET = env("CUSTOM_LLM_SECRET")
 OPENAI_API_KEY = env("OPENAI_API_KEY")
-STT_MODEL = env("STT_MODEL", "gpt-transcribe")  # push-to-talk speech recognition for Azerbaijani
+STT_MODEL = env("STT_MODEL", "gpt-transcribe")
+# our fine-tuned Gemma 3 1B + LoRA (training/serve_analyst.py); classifies conversations locally. Empty = cloud only
+LOCAL_ANALYST_URL = env("LOCAL_ANALYST_URL", "http://127.0.0.1:8001")  # push-to-talk speech recognition for Azerbaijani
 
 STORE_NAME = "Mallard"
 AGENT_NAME = "Aysu"

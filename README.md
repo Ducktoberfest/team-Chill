@@ -42,6 +42,7 @@ The demo store is **Mallard**, a fictional Azerbaijani online shop with a mallar
 | **Sees photos** | The customer attaches a photo, such as a cracked screen or a damaged parcel. Gemma 4 describes it, decides with the policy engine, and stores its assessment on the return request. |
 | **Phone-style voice call** | Pressing call plays a real 425 Hz ringback, then Aysu picks up as a 3D avatar. ElevenLabs does speech-to-text and the voice. Gemma 4 is still the brain, reached through our OpenAI-compatible Custom LLM endpoint. |
 | **Lip sync and emotion** | Lip shapes follow ElevenLabs' per-character audio timings, with mouth opening scaled by the real loudness. Gemma starts each spoken reply with a tone tag such as `[empathetically]`, which changes both the voice and Aysu's face. |
+| **Local fine-tuned analyst** | Our Unsloth-trained Gemma 3 1B + LoRA (`training/serve_analyst.py`, port 8001) classifies every finished conversation offline on the laptop GPU. Gemma 4 26B adds the summary and email in parallel. |
 | **Post-conversation automation** | When a chat ends, or goes quiet for 10 s, Gemma 4 returns structured JSON: summary, category, urgency, sentiment, resolved, needs-human, action items, a follow-up email and any knowledge-base gap. If a human is needed, a ticket opens automatically. |
 | **Ops dashboard** | `/dashboard` shows KPIs, every conversation with its AI analysis and email draft, tickets (opened by the agent or by automation), returns with photo assessments, and questions the knowledge base could not answer. |
 | **Open-weight RAG** | Store policies are embedded with **EmbeddingGemma**, which runs locally in Ollama, and searched with **pgvector** in **Neon** Postgres. |
@@ -65,7 +66,7 @@ The demo store is **Mallard**, a fictional Azerbaijani online shop with a mallar
 
 ## Fine-tuned local analyst
 
-We fine-tuned **Gemma 3 1B** with **Unsloth QLoRA** for the post-conversation analysis task, so the automation can run on an 8 GB laptop GPU without the cloud.
+We fine-tuned **Gemma 3 1B** with **Unsloth QLoRA** for the post-conversation analysis task, and **it runs inside the app**. When a conversation ends, our 1B model classifies it locally on the laptop GPU (category, urgency, sentiment, resolved, needs-human, team) while Gemma 4 26B writes the summary and follow-up email in parallel. The dashboard marks these analyses `1B LoRA · lokal`. If the local service is down or busy, the cloud result is used instead.
 
 - **Data.** 229 labelled Azerbaijani support conversations. Labels were sampled *first* (7 categories × 3 urgencies × 3 sentiments × resolved/needs-human, 12 products, 6 customer styles), then Gemma 4 26B wrote a matching conversation. This makes the ground truth exact. The 40-conversation test set is held out.
 - **Training.** 4-bit QLoRA, rank 16, 3 epochs, loss on the JSON answer only. It took **284 s** on an RTX 4070 Laptop (8 GB).
@@ -115,7 +116,7 @@ flowchart LR
     A --> N
     B -- "KB search" --> EG[EmbeddingGemma<br/>Ollama, local]
     EG --> N
-    FT[Gemma 3 1B + LoRA<br/>Unsloth] -. "offline analyst" .-> A
+    A -- "classification" --> FT[Gemma 3 1B + LoRA<br/>local, Unsloth]
 ```
 
 ## Models and licenses
@@ -155,6 +156,7 @@ Then open <http://localhost:8000> for the store and agent, and <http://localhost
 |---|---|
 | Fully local brain | Set `LLM_BACKEND=ollama` in `.env`. The same agent then runs on Gemma 4 on your own GPU. |
 | Voice | Create an ElevenLabs Conversational AI agent. Under *LLM*, choose **Custom LLM** with server URL `https://<public-url>/v1` (for local testing: `cloudflared tunnel --url http://localhost:8000`). Enable the *Custom LLM extra body* override, and put the agent id in `ELEVENLABS_AGENT_ID`. The system prompt lives in `backend/app/prompts.py`. |
+| Local 1B analyst | `cd training && .venv/bin/uvicorn serve_analyst:app --port 8001` (needs the Unsloth venv from [training/REPORT.md](training/REPORT.md)). Set `LOCAL_ANALYST_URL=` (empty) to use the cloud only. |
 | Rebuild the fine-tune | See [training/REPORT.md](training/REPORT.md). |
 | Rebuild the slides | `cd deck && node build.js` (Azerbaijani) or `python3 make_en.py && node build_en.js` (English). |
 

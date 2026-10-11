@@ -22,7 +22,8 @@ function conv(c) {
   }
   return `<div class="conv">${head}
     <div>${tag(a.category, "")} ${tag(a.urgency)} ${tag(a.sentiment)} ${a.resolved ? tag("həll olundu", "ok") : tag("açıq", "medium")}
-      ${a.auto_ticket ? tag("avto-bilet " + a.auto_ticket, "P2") : ""}</div>
+      ${a.auto_ticket ? tag("avto-bilet " + a.auto_ticket, "P2") : ""}
+      ${a.analyst ? `<span class="tag analyst" title="Təsnifat: fine-tune etdiyimiz model, noutbukda">${esc("1B LoRA · lokal")}</span>` : ""}</div>
     <div>${esc(a.summary)}</div>
     ${a.action_items?.filter(Boolean).length ? `<ul class="actions">${a.action_items.filter(Boolean).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
     <details><summary class="muted"><i data-lucide="mail"></i> Follow-up email: <b>${esc(a.follow_up_email?.subject)}</b></summary>
