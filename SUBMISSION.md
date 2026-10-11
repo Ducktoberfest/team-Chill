@@ -13,10 +13,10 @@
 - **Photos:** Gemma 4 reads customer photos, such as a damaged product, and puts its assessment into the return request.
 - **Voice:** a phone-style call with a 3D avatar. ElevenLabs handles speech-to-text and the voice; Gemma 4 is the brain, reached through our OpenAI-compatible Custom LLM endpoint.
 - **After the conversation:** Gemma 4 produces structured JSON with the summary, category, urgency, sentiment, resolved/needs-human flag, action items, follow-up email and knowledge-base gap. If a human is needed, a ticket opens automatically. All of it shows on the ops dashboard.
-- **Fine-tuning:** we fine-tuned **Gemma 4 E2B** with Unsloth (QLoRA) on a labelled Azerbaijani support dataset, so the analysis can run on a local 8 GB GPU. Results are in `training/REPORT.md`.
+- **Fine-tuning:** we fine-tuned **Gemma 3 1B** with Unsloth QLoRA on 229 labelled Azerbaijani support conversations, in 284 s on an 8 GB laptop GPU. On a held-out test set, mean accuracy rose from 29.6% to 61.3% and valid JSON from 75% to 100%. On sentiment it beats zero-shot Gemma 4 26B (72.5% vs 70%). See `training/REPORT.md`.
 
 ## How we built it
-Gemma 4 26B MoE (Gemini API), Gemma 4 E2B/E4B (Ollama, Unsloth), EmbeddingGemma + pgvector on Neon Postgres, FastAPI, ElevenLabs Conversational AI, Three.js, Openverse CC images.
+Gemma 4 26B MoE (Gemini API), Gemma 4 E4B (Ollama, local fallback), Gemma 3 1B + LoRA (Unsloth), EmbeddingGemma + pgvector on Neon Postgres, FastAPI, ElevenLabs Conversational AI, Three.js, Openverse CC images.
 
 ## Technologies
 Gemma 4, EmbeddingGemma, Unsloth, Ollama, Gemini API, Neon, pgvector, FastAPI, ElevenLabs, Three.js

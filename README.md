@@ -19,6 +19,19 @@ The demo store is **Mallard**, a fictional Azerbaijani online shop. All customer
 | 📊 **Ops dashboard** | `/dashboard` shows KPIs, every conversation with its AI analysis and follow-up email, tickets (agent- vs automation-created), returns with photo assessments, and questions the KB couldn't answer. |
 | 🔎 **RAG on open weights** | The store's policies are embedded with **EmbeddingGemma** (running locally in Ollama) and searched with **pgvector** in **Neon** Postgres. |
 
+## Fine-tuned local analyst (Unsloth)
+
+We fine-tuned **Gemma 3 1B** with **Unsloth QLoRA** for ChillDesk's post-conversation analysis, so it can run on a laptop GPU without the cloud. The training data is 229 labelled Azerbaijani support conversations; labels were sampled first and Gemma 4 26B wrote matching conversations, so the ground truth is exact. Training took 284 s on an RTX 4070 Laptop (8 GB).
+
+| Held-out test (40 conversations) | Gemma 3 1B base | **Gemma 3 1B + our LoRA** | Gemma 4 26B (API, zero-shot) |
+|---|---|---|---|
+| Valid JSON | 75% | **100%** | 100% |
+| Mean field accuracy | 29.6% | **61.3%** | 75.8% |
+| Category | 0% | **65%** | 82.5% |
+| Sentiment | 32.5% | **72.5%** | 70% |
+
+Details, charts and reproduction steps: [training/REPORT.md](training/REPORT.md). The adapter is in `training/out/chilldesk-analyst-lora`. We had planned to fine-tune Gemma 4 E2B, but the venue Wi-Fi (~0.9 MB/s) could not download its 8 GB of weights in time, so we fine-tuned the 1 GB Gemma 3 1B instead.
+
 ## Architecture
 
 ```
