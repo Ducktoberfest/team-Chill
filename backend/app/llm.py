@@ -17,6 +17,7 @@ from __future__ import annotations
 import base64
 import logging
 import json
+import re
 import uuid
 from dataclasses import dataclass, field
 
@@ -122,7 +123,8 @@ async def _chat_gemini(messages, tools, json_schema, thinking) -> Reply:
             elif p.text and not p.thought:
                 text.append(p.text)
         break
-    return Reply("".join(text).strip(), calls)
+    # minimal thinking sometimes leaks a bare "thought" marker at the start of the answer
+    return Reply(re.sub(r"^\s*thought\b[:\s]*", "", "".join(text)).strip(), calls)
 
 
 # ---------------------------------------------------------------- Ollama (local)

@@ -17,6 +17,7 @@ CUSTOMERS = [
     ("C003", "Nigar Həsənova", "+994703334455", "nigar.h@example.com", "Bakı"),
     ("C004", "Tural Quliyev", "+994514445566", "tural.q@example.com", "Gəncə"),
     ("C005", "Günel İsmayılova", "+994775556677", "gunel.i@example.com", "Bakı"),
+    ("C006", "Ali Hasanov", "+994707616288", "ali.h@example.com", "Bakı"),
 ]
 
 # id, name, category, price, stock, warranty_months
@@ -59,4 +60,15 @@ ORDERS = [
     ("ML-1055", "C001", "shipped", "Kart (Visa •• 4821)", "AzKargo", "AK-5537764", "Bakı, Nərimanov r., Ə. Rəcəbli 12, m. 34",
      ago(2, 9), (NOW + timedelta(days=1)).date(), None, [("P107", 2)],
      [("sifariş qəbul edildi", ago(2, 9)), ("anbardan çıxdı", ago(1, 12))]),
+    # Ali Hasanov: three live-demo cases (damaged photo, delay, change of mind)
+    ("ML-2001", "C006", "delivered", "Kart (Visa •• 6288)", "Mallard Express", "ME-77150021", "Bakı, Nəsimi r., Füzuli küç. 58, m. 12",
+     ago(4, 10), ago(2).date(), ago(2, 17), [("P110", 1)],
+     [("sifariş qəbul edildi", ago(4, 10)), ("kuryerdə", ago(2, 9)), ("çatdırıldı", ago(2, 17))]),
+    ("ML-2002", "C006", "delayed", "Hissə-hissə (BirKart, 12 ay)", "Mallard Express", "ME-77150388", "Bakı, Nəsimi r., Füzuli küç. 58, m. 12",
+     ago(7, 13), ago(3).date(), None, [("P104", 1)],
+     [("sifariş qəbul edildi", ago(7, 13)), ("anbardan çıxdı", ago(5, 11)),
+      ("gecikmə: anbarda keyfiyyət yoxlaması", ago(3, 16))]),
+    ("ML-2003", "C006", "delivered", "Kart (Visa •• 6288)", "Mallard Express", "ME-77149870", "Bakı, Nəsimi r., Füzuli küç. 58, m. 12",
+     ago(8, 12), ago(5).date(), ago(5, 14), [("P109", 1)],
+     [("sifariş qəbul edildi", ago(8, 12)), ("çatdırıldı", ago(5, 14))]),
 ]

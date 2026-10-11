@@ -7,7 +7,7 @@
   <link rel="icon" href="/static/brand/mallard.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=11">
+  <link rel="stylesheet" href="/static/styles.css?v=12">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script type="importmap">
     { "imports": {
@@ -25,10 +25,15 @@
       <a href="#reviews">Rəylər</a>
     </nav>
     <div class="spacer"></div>
-    <label class="select-wrap" title="Hesab">
-      <i data-lucide="user"></i>
-      <select id="customer" class="select"><option value="">Qonaq</option></select>
-    </label>
+    <div class="account" id="account">
+      <button class="account-btn" id="account-btn" aria-haspopup="listbox" aria-expanded="false" title="Hesab">
+        <span class="acc-av guest" id="acc-av"><i data-lucide="user"></i></span>
+        <span class="acc-name" id="acc-name">Qonaq</span>
+        <i data-lucide="chevron-down" class="acc-chev"></i>
+      </button>
+      <div class="account-menu" id="account-menu" role="listbox" aria-label="Hesab seçin"></div>
+      <select id="customer" hidden><option value="">Qonaq</option></select>
+    </div>
     <span class="cart"><i data-lucide="shopping-bag"></i><b id="cart-count">0</b></span>
     <a class="link" href="/dashboard">ChillDesk</a>
   </header>
@@ -126,6 +131,6 @@
     </div>
   </section>
 
-  <script type="module" src="/static/app.js?v=10"></script>
+  <script type="module" src="/static/app.js?v=12"></script>
 </body>
 </html>

@@ -265,6 +265,7 @@ async function boot() {
   config = await fetch("/api/config").then((r) => r.json());
   $("#model-label").textContent = `${config.model} · ${config.embed_model}`;
   for (const c of config.customers) $("#customer").append(new Option(`${c.name} (${c.city})`, c.id));
+  buildAccountMenu(config.customers);
   products = await fetch("/api/products").then((r) => r.json());
   const cats = ["Hamısı", ...new Set(products.map((p) => p.category))];
   $("#cats").innerHTML = cats.map((c, i) => `<button class="cat-btn${i ? "" : " on"}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
@@ -290,6 +291,45 @@ function renderProducts(cat) {
   paintIcons();
   reveal($("#products-grid"));
   tiltAll(".card", 8);
+}
+
+// ---------------------------------------------------------------- account picker (glass popover)
+const AV_COLORS = ["#0b7a5c", "#14b8a6", "#f97316", "#0f766e", "#ea580c", "#16a34a"];
+const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+function buildAccountMenu(customers) {
+  const menu = $("#account-menu");
+  const items = [{ id: "", name: "Qonaq", city: "Daxil olmadan" }, ...customers];
+  menu.innerHTML = items.map((c, i) => `
+    <button class="acc-item" role="option" data-id="${esc(c.id)}" style="--d:${i * 28}ms">
+      <span class="acc-av ${c.id ? "" : "guest"}" style="${c.id ? `background:${AV_COLORS[i % AV_COLORS.length]}` : ""}">${c.id ? esc(initials(c.name)) : icon("user")}</span>
+      <span class="acc-text"><b>${esc(c.name)}</b><small>${esc(c.city)}</small></span>
+      <span class="acc-check">${icon("check")}</span>
+    </button>`).join("");
+  paintIcons();
+  const btn = $("#account-btn");
+  const setOpen = (open) => { $("#account").classList.toggle("open", open); btn.setAttribute("aria-expanded", open); };
+  btn.onclick = (e) => { e.stopPropagation(); setOpen(!$("#account").classList.contains("open")); };
+  document.addEventListener("click", (e) => { if (!$("#account").contains(e.target)) setOpen(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+  menu.addEventListener("click", (e) => {
+    const it = e.target.closest(".acc-item"); if (!it) return;
+    const sel = $("#customer");
+    sel.value = it.dataset.id;
+    sel.dispatchEvent(new Event("change"));
+    setOpen(false);
+  });
+  const sync = () => {
+    const id = $("#customer").value, i = items.findIndex((c) => c.id === id), c = items[i];
+    menu.querySelectorAll(".acc-item").forEach((el) => el.classList.toggle("on", el.dataset.id === id));
+    const av = $("#acc-av");
+    av.className = "acc-av" + (id ? "" : " guest");
+    av.style.background = id ? AV_COLORS[i % AV_COLORS.length] : "";
+    av.innerHTML = id ? esc(initials(c.name)) : icon("user");
+    $("#acc-name").textContent = c.name;
+    paintIcons();
+  };
+  $("#customer").addEventListener("change", sync);
+  sync();
 }
 
 function openPanel() { $("#panel").classList.add("open"); $("#fab").style.display = "none"; $("#input").focus(); }
