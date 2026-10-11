@@ -38,7 +38,7 @@ Aysu şərtləri deyib təsdiq istəyir. Cavab ver:
 Gözlənilən: `create_return` → **refund**, kartla ödəniş üçün **3–5 iş günü**.
 
 ## Final · Dashboard (≈10 s sonra)
-Söhbəti ✓ ilə bağla (və ya 10 saniyə gözlə) → dashboard: xülasə, kateqoriya, təcililik, emosiya, avto-bilet, hazır **follow-up email**.
+Söhbəti "Bitir" düyməsi ilə bağla (və ya 10 saniyə gözlə) → dashboard: xülasə, kateqoriya, təcililik, emosiya, avto-bilet, hazır **follow-up email**.
 
 ## Bonus · Səsli zəng
 Zəng düyməsi → "duut… duut" → Aysu qoşulur. De: *"Salam, mənim nömrəm sıfır yetmiş, yeddi yüz altmış bir, altmış iki, səksən səkkiz. Noutbukum nə vaxt gələcək?"*
