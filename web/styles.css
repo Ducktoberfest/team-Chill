@@ -344,7 +344,8 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.9; flex: none; }
 @keyframes callIn { from { opacity: 0; transform: scale(1.04); } }
 .call-screen.closing { animation: callOut .35s ease forwards; }
 @keyframes callOut { to { opacity: 0; transform: scale(.98); } }
-.stage { position: absolute; inset: 0 0 150px 0; opacity: 0; transition: opacity .9s ease; }
+.stage { position: absolute; inset: 0 0 110px 0; opacity: 0; transition: opacity .9s ease;
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent); mask-image: linear-gradient(to bottom, #000 72%, transparent); }
 .call-screen.connected .stage { opacity: 1; }
 .stage canvas { display: block; }
 .ringer { position: relative; width: 150px; height: 150px; margin-bottom: 28px; transition: opacity .6s, transform .6s; }

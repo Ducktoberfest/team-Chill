@@ -20,7 +20,7 @@ OUT = Path(__file__).parent / "out"
 
 async def main() -> None:
     rows = load("test")
-    sem = asyncio.Semaphore(10)
+    sem = asyncio.Semaphore(4)
     times: list[float] = []
 
     async def one(row):

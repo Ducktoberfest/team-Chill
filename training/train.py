@@ -1,4 +1,4 @@
-"""QLoRA fine-tune of Gemma 4 E2B for the ChillDesk analyst task with Unsloth.
+"""QLoRA fine-tune of Gemma 3 1B for the ChillDesk analyst task with Unsloth.
 
     .venv/bin/python train.py --model unsloth/gemma-4-E2B-it --epochs 2
 Saves the LoRA adapter to out/chilldesk-analyst-lora and the training log to out/train_log.json.
@@ -21,7 +21,7 @@ OUT = Path(__file__).parent / "out"
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="unsloth/gemma-4-E2B-it")
+    ap.add_argument("--model", default="unsloth/gemma-3-1b-it-unsloth-bnb-4bit")
     ap.add_argument("--epochs", type=float, default=2)
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--rank", type=int, default=16)

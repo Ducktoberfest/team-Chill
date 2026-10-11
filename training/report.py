@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 HERE = Path(__file__).parent
 OUT = HERE / "out"
-RUNS = [("base", "Gemma 4 E2B (base)"), ("finetuned", "Gemma 4 E2B + ChillDesk LoRA"), ("teacher", "Gemma 4 26B (API, reference)")]
+RUNS = [("base", "Gemma 3 1B (base)"), ("finetuned", "Gemma 3 1B + ChillDesk LoRA"), ("teacher", "Gemma 4 26B (API, reference)")]
 METRICS = [("json_valid", "Valid JSON"), ("acc_category", "Category"), ("acc_urgency", "Urgency"), ("acc_sentiment", "Sentiment"),
            ("acc_resolved", "Resolved"), ("acc_needs_human", "Needs human"), ("acc_team", "Team"), ("all_fields_exact", "All fields exact")]
 COLORS = {"base": "#9aa5a3", "finetuned": "#0b7a5c", "teacher": "#f97316"}
@@ -47,7 +47,7 @@ def main() -> None:
         ax.set_xlabel("step"); ax.set_ylabel("training loss"); ax.spines[["top", "right"]].set_visible(False)
         fig.tight_layout(); fig.savefig(HERE / "loss.png")
 
-    lines = ["# Fine-tuning Gemma 4 E2B for ChillDesk", "",
+    lines = ["# Fine-tuning a 1B Gemma for ChillDesk", "",
              "**Goal:** run ChillDesk's post-conversation analysis on a small, local, open-weight model (8 GB laptop GPU) "
              "instead of a large hosted model, without losing accuracy.", "",
              "**Task:** read an Azerbaijani customer-support conversation and return JSON with the summary, category (7), urgency (3), "
@@ -55,7 +55,7 @@ def main() -> None:
              "**Data:** synthetic conversations written by Gemma 4 26B (teacher) from labels sampled *before* generation, so the "
              "ground truth is exact. The labels cover 7 categories × 3 urgencies × 3 sentiments, plus resolved/needs-human, 12 products and 6 customer styles "
              "(polite, rushed, angry, elderly, colloquial, mixed Russian). The test set is held out and never seen in training.", "",
-             f"**Training:** Unsloth QLoRA (4-bit) on `{log.get('model', 'unsloth/gemma-4-E2B-it')}` · "
+             f"**Training:** Unsloth QLoRA (4-bit) on `{log.get('model', 'unsloth/gemma-3-1b-it-unsloth-bnb-4bit')}` · "
              f"{log.get('train_examples', '?')} examples · {log.get('epochs', '?')} epochs · LoRA rank {log.get('lora_rank', '?')} · "
              f"lr {log.get('lr', '?')} · loss on the JSON answer only · {log.get('seconds', '?')} s on an RTX 4070 Laptop (8 GB).", "",
              "## Results", "", "![results](report.png)", "",

@@ -1,4 +1,4 @@
-"""Evaluate Gemma 4 E2B on the held-out test set, base or with the fine-tuned LoRA adapter.
+"""Evaluate Gemma 3 1B on the held-out test set, base or with the fine-tuned LoRA adapter.
 
     .venv/bin/python eval_local.py --name base
     .venv/bin/python eval_local.py --name finetuned --adapter out/chilldesk-analyst-lora
@@ -21,7 +21,7 @@ OUT = Path(__file__).parent / "out"
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--name", required=True)
-    ap.add_argument("--model", default="unsloth/gemma-4-E2B-it")
+    ap.add_argument("--model", default="unsloth/gemma-3-1b-it-unsloth-bnb-4bit")
     ap.add_argument("--adapter")
     ap.add_argument("--limit", type=int, default=0)
     a = ap.parse_args()
