@@ -52,14 +52,17 @@ Details, charts and reproduction steps: [training/REPORT.md](training/REPORT.md)
 
 ## Models and key dependencies
 
-| Component | Model / library | License |
-|---|---|---|
-| Agent + vision + automation | **Gemma 4** `gemma-4-26b-a4b-it` via the Gemini API, or `gemma4:e4b-it-qat` locally via Ollama | [Apache 2.0](https://opensource.googleblog.com/2026/03/gemma-4-expanding-the-gemmaverse-with-apache-20.html) |
-| Embeddings | **EmbeddingGemma** (`embeddinggemma` in Ollama, 768-dim) | [Gemma Terms of Use](https://ai.google.dev/gemma/terms) |
-| Voice I/O | ElevenLabs Conversational AI (STT + TTS only; reasoning is done by Gemma) | proprietary service |
-| Database | Neon Postgres + pgvector | — |
-| Backend | FastAPI, google-genai, psycopg 3, httpx | MIT / Apache 2.0 / LGPL |
-| Frontend | Plain HTML/CSS/JS, `@elevenlabs/client` | MIT |
+| Component | Model / library | Size class | License / terms |
+|---|---|---|---|
+| Agent, vision, post-conversation analysis | **Gemma 4 26B A4B** (`gemma-4-26b-a4b-it`, Gemini API) — [model card](https://ai.google.dev/gemma/docs/core) | large (>10B) | [Apache 2.0](https://opensource.googleblog.com/2026/03/gemma-4-expanding-the-gemmaverse-with-apache-20.html) |
+| Local fallback agent | **Gemma 4 E4B** (`gemma4:e4b-it-qat`, Ollama) — [model page](https://ollama.com/library/gemma4) | small (≤10B) | [Apache 2.0](https://opensource.googleblog.com/2026/03/gemma-4-expanding-the-gemmaverse-with-apache-20.html) |
+| Knowledge-base embeddings | **EmbeddingGemma** (`embeddinggemma`, Ollama, 768-dim) — [docs](https://ai.google.dev/gemma/docs/embeddinggemma) | small | [Gemma Terms of Use](https://ai.google.dev/gemma/terms) |
+| Fine-tuned local analyst | **Gemma 3 1B** (`unsloth/gemma-3-1b-it-unsloth-bnb-4bit`) + our LoRA — [model card](https://huggingface.co/unsloth/gemma-3-1b-it-unsloth-bnb-4bit) | small | [Gemma Terms of Use](https://ai.google.dev/gemma/terms); our adapter: MIT |
+| Fine-tuning | [Unsloth](https://github.com/unslothai/unsloth), TRL, PEFT, bitsandbytes | — | Apache 2.0 |
+| Voice I/O | ElevenLabs Conversational AI (STT + TTS only; Gemma does the reasoning) | — | proprietary service |
+| Database | Neon Postgres + pgvector | — | Apache 2.0 / PostgreSQL |
+| Backend | FastAPI, google-genai, psycopg 3, httpx | — | MIT / Apache 2.0 / LGPL |
+| Frontend | Plain HTML/CSS/JS, Three.js, `@elevenlabs/client`, Lucide icons | — | MIT / ISC |
 
 We picked the local model with [llmfit](https://github.com/AlexsJones/llmfit) for our hardware (RTX 4070 Laptop, 8 GB). Gemma 4 E4B QAT was the best official Gemma 4 build that fits fully on the GPU.
 
