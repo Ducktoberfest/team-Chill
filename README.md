@@ -5,7 +5,7 @@
 
 ChillDesk gives an online store a support agent that **talks to customers by chat and by phone-quality voice, looks at photos, takes real actions in the store's database, and then closes the loop automatically**: every finished conversation is summarized, classified and turned into tickets and a follow-up email, with no human in the loop.
 
-The demo store is **Mallard**, a fictional Azerbaijani online shop. All customers, orders and products are synthetic. The agent is **Aysu** and speaks Azerbaijani, Russian and English.
+The demo store is **Mallard**, a fictional Azerbaijani online shop. All customers, orders and products are synthetic. The agent is **Aysu** and speaks Azerbaijani (voice), plus Russian and English in chat.
 
 ## What it does
 
