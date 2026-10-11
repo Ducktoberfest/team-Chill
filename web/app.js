@@ -105,6 +105,7 @@ async function send(text) {
         if (ev.type === "conversation") conversationId = ev.id;
         else if (ev.type === "tool") { addStep(ev); $("#messages").append(typing); reactToTool(ev); }
         else if (ev.type === "text") addMsg("bot", ev.text);
+        else if (ev.type === "focus") showOrderCard(ev.card);
         else if (ev.type === "error") { addMsg("bot", "Xəta: " + ev.error); aysu?.setEmotion("concerned"); aysu?.setState("idle"); }
       }
     }
@@ -131,6 +132,54 @@ function reactToTone(source, text) {
   const tag = (text.match(/\[([a-zA-Z]+)\]/) || [])[1];
   const emo = tag && TAG_EMOTION[tag.toLowerCase()];
   if (emo) aysu.setEmotion(emo, { durationMs: 7000 });
+}
+
+// ---------------------------------------------------------------- order card next to the panel
+const STATUS = {
+  delivered: ["Çatdırılıb", "ok"], delayed: ["Gecikir", "warn"], shipped: ["Yoldadır", "info"],
+  out_for_delivery: ["Bu gün kuryerdə", "info"], processing: ["Hazırlanır", "muted"], cancelled: ["Ləğv olunub", "bad"],
+};
+const RESOLUTION = { replacement: "Pulsuz dəyişmə", refund: "Pul qaytarılır", review: "Mütəxəssis yoxlaması" };
+let cardKey = "";
+function showOrderCard(c) {
+  if (!c) return;
+  const key = JSON.stringify([c.id, c.status, c.returns, c.tickets]);
+  if (key === cardKey) return;
+  const el = $("#order-card");
+  const first = el.hidden;
+  cardKey = key;
+  const it = c.items[0] || {};
+  const [st, tone] = STATUS[c.status] || [c.status, "muted"];
+  const when = c.status === "delivered" && c.delivered_at ? `Çatdırılıb: ${c.delivered_at.slice(0, 10)}` : c.eta ? `Gözlənilən: ${c.eta}` : "";
+  const ret = c.returns[0], tk = c.tickets[0];
+  const html = `
+    <button class="oc-close" title="Bağla">${icon("x")}</button>
+    <div class="oc-img"><img src="/static/img/${esc(it.id || "")}.jpg" alt=""></div>
+    <div class="oc-body">
+      <div class="oc-top"><span class="oc-id">${esc(c.id)}</span><span class="oc-status ${tone}">${esc(st)}</span></div>
+      <div class="oc-name">${esc(it.name || "")}${c.items.length > 1 ? ` <small>+${c.items.length - 1}</small>` : ""}</div>
+      <div class="oc-price">${Number(c.total).toLocaleString("az-AZ")} ₼</div>
+      <div class="oc-row">${icon("calendar")}<span>${esc(when)}</span></div>
+      ${c.courier ? `<div class="oc-row">${icon("truck")}<span>${esc(c.courier)} · ${esc(c.tracking || "")}</span></div>` : ""}
+      ${c.last_event ? `<div class="oc-row">${icon("activity")}<span>${esc(c.last_event)}</span></div>` : ""}
+      ${ret ? `<div class="oc-badge ok">${icon("undo-2")}<span>${esc(ret.id)} · ${esc(RESOLUTION[ret.resolution] || ret.resolution)}</span></div>` : ""}
+      ${tk ? `<div class="oc-badge warn">${icon("ticket")}<span>${esc(tk.id)} · ${esc(tk.team)} · ${esc(tk.priority)}</span></div>` : ""}
+    </div>`;
+  if (first) { el.innerHTML = html; el.hidden = false; el.classList.remove("swap"); void el.offsetWidth; el.classList.add("in"); }
+  else { el.classList.add("swap"); setTimeout(() => { el.innerHTML = html; paintIcons(); el.classList.remove("swap"); }, 220); }
+  paintIcons();
+}
+function hideOrderCard() { const el = $("#order-card"); el.classList.remove("in"); setTimeout(() => { el.hidden = true; }, 300); cardKey = ""; }
+document.addEventListener("click", (e) => { if (e.target.closest(".oc-close")) hideOrderCard(); });
+
+// during a voice call the agent runs on the server, so poll for the order it is talking about
+let focusTimer = null;
+function pollFocus(cid) {
+  clearInterval(focusTimer);
+  focusTimer = setInterval(async () => {
+    const f = await fetch(`/api/voice/focus?cid=${encodeURIComponent(cid)}`).then((r) => r.json()).catch(() => ({}));
+    if (f.card) showOrderCard(f.card);
+  }, 1000);
 }
 
 function reactToTool(ev) {
@@ -228,6 +277,7 @@ async function toggleCall() {
         }, 1000);
         aysu?.useFrequencySource(() => voice && voice.getOutputByteFrequencyData());
         aysu?.setState("listening");
+        pollFocus(voiceId);
       },
       onModeChange: ({ mode }) => {
         setCallStatus(mode === "speaking" ? "Aysu danışır" : "Aysu dinləyir");
@@ -242,6 +292,7 @@ async function toggleCall() {
       onError: (e) => addMsg("bot", "Səs xətası: " + (e?.message || e)),
       onDisconnect: () => {
         voice = null; calling = false; cancelCall = null;
+        clearInterval(focusTimer);
         stopRingOnce();
         aysu?.stopAudio(); aysu?.setState("idle");
         closeCallScreen();
@@ -351,7 +402,7 @@ $("#products-grid").addEventListener("click", (e) => {
 $("#hero-aysu").onclick = openPanel;
 $("#band-aysu").onclick = openPanel;
 $("#fab").onclick = openPanel;
-$("#close").onclick = () => { $("#panel").classList.remove("open"); $("#fab").style.display = ""; };
+$("#close").onclick = () => { $("#panel").classList.remove("open"); $("#fab").style.display = ""; hideOrderCard(); };
 $("#send").onclick = () => send($("#input").value);
 $("#input").addEventListener("input", () => { if (!voice) aysu?.setState("listening"); });
 $("#input").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send($("#input").value); } });
@@ -364,7 +415,7 @@ $("#file").addEventListener("change", async (e) => {
 $("#end").onclick = async () => { const id = conversationId; conversationId = null; await endConversation(id); };
 $("#call").onclick = toggleCall;
 $("#hangup").onclick = () => { if (voice) voice.endSession(); else if (cancelCall) cancelCall(); };
-$("#customer").addEventListener("change", () => { conversationId = null; $("#messages").innerHTML = ""; addMsg("bot", "Yeni söhbət. Necə kömək edə bilərəm?"); });
+$("#customer").addEventListener("change", () => { hideOrderCard(); conversationId = null; $("#messages").innerHTML = ""; addMsg("bot", "Yeni söhbət. Necə kömək edə bilərəm?"); });
 
 initMotion();
 boot();

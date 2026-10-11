@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from app import agent, automation, config, db, llm
+from app import tools
 from app.tools import Session
 
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +26,20 @@ WEB = Path(__file__).resolve().parents[2] / "web"
 # Full in-memory history per conversation (images included); the DB keeps a storable copy.
 HISTORY: dict[str, list[dict]] = {}
 SESSIONS: dict[str, Session] = {}
+FOCUS: dict[str, dict] = {}   # conversation id -> {"card", "ts"}: the order the conversation is about, for the UI
+
+
+def _focus(s: Session, user_text: str, events: list[dict], reply: str) -> dict | None:
+    """The order this turn is about: an order id used by a tool, else an order id or product named in the text."""
+    oid = None
+    for ev in events:
+        a, r = ev.get("args") or {}, ev.get("result") or {}
+        oid = a.get("order_id") or (r.get("order") or {}).get("id") or oid
+    oid = oid or tools.match_order(s.customer_id, f"{user_text}\n{reply}")
+    card = tools.order_card(oid) if oid else None
+    if card:
+        FOCUS[s.conversation_id] = {"card": card, "ts": time.time()}
+    return card
 
 
 @asynccontextmanager
@@ -83,8 +98,16 @@ async def chat(body: ChatIn):
     async def stream():
         yield f"data: {json.dumps({'type': 'conversation', 'id': s.conversation_id})}\n\n"
         try:
+            events, reply = [], ""
             async for ev in agent.respond(s, history, user_msg):
+                if ev["type"] == "tool":
+                    events.append(ev)
+                elif ev["type"] == "text":
+                    reply = ev["text"]
                 yield f"data: {json.dumps(ev, ensure_ascii=False, default=str)}\n\n"
+            card = await asyncio.to_thread(_focus, s, body.message, events, reply)
+            if card:
+                yield f"data: {json.dumps({'type': 'focus', 'card': card}, ensure_ascii=False, default=str)}\n\n"
         except llm.LLMError as e:
             log.exception("llm error")
             yield f"data: {json.dumps({'type': 'error', 'error': str(e)})}\n\n"
@@ -141,13 +164,17 @@ async def custom_llm(request: Request, authorization: str | None = Header(defaul
 
     async def stream():
         filler_sent = False
+        events: list[dict] = []
         try:
             async for ev in agent.respond(s, history, {"role": "user", "content": text or "..."}):
+                if ev["type"] == "tool":
+                    events.append(ev)
                 if ev["type"] == "tool" and not filler_sent:
                     filler_sent = True
                     yield _chunk(cid, "Bir saniyə, yoxlayıram. ")
                 elif ev["type"] == "text":
                     yield _chunk(cid, ev["text"])
+                    await asyncio.to_thread(_focus, s, text or "", events, ev["text"])
         except llm.LLMError:
             log.exception("llm error (voice)")
             yield _chunk(cid, "Bağışlayın, texniki problem yarandı. Bir az sonra yenidən cəhd edin.")
@@ -157,6 +184,16 @@ async def custom_llm(request: Request, authorization: str | None = Header(defaul
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(stream(), media_type="text/event-stream")
+
+
+@app.get("/api/voice/focus")
+def voice_focus(cid: str = ""):
+    """The order a voice call is about. Falls back to the most recent voice focus (if ElevenLabs dropped our id)."""
+    f = FOCUS.get(cid)
+    if not f:
+        recent = [v for k, v in FOCUS.items() if k.startswith("V-") and time.time() - v["ts"] < 120]
+        f = max(recent, key=lambda v: v["ts"]) if recent else None
+    return f or {}
 
 
 # ------------------------------------------------------------------ dashboard + config

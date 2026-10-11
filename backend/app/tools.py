@@ -170,3 +170,76 @@ def _run(s: Session, name: str, a: dict) -> dict:
 
 def result_text(result: dict) -> str:
     return json.dumps(result, ensure_ascii=False, default=str)
+
+
+# ---------------------------------------------------------------- prompt snapshot and UI card
+
+_MONTHS = ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avqust", "sentyabr", "oktyabr", "noyabr", "dekabr"]
+
+
+def _az_date(v) -> str | None:
+    """'9 oktyabr, 17:00 (2 gün əvvəl)': easy to say out loud, unlike ISO timestamps."""
+    if not v:
+        return None
+    from datetime import date, datetime as dt, timedelta as td, timezone as tz
+    baku = tz(td(hours=4))
+    today = dt.now(baku).date()
+    d = v.astimezone(baku) if isinstance(v, dt) else v
+    day = d.date() if isinstance(d, dt) else d
+    txt = f"{day.day} {_MONTHS[day.month - 1]}" + (f", {d:%H:%M}" if isinstance(d, dt) else "")
+    diff = (today - day).days
+    rel = "bu gün" if diff == 0 else "dünən" if diff == 1 else "sabah" if diff == -1 else f"{diff} gün əvvəl" if diff > 0 else f"{-diff} gün sonra"
+    return f"{txt} ({rel})"
+
+
+def orders_snapshot(customer_id: str) -> list[dict]:
+    """All of a customer's orders in one compact list, so simple status questions need no tool round trip."""
+    rows = db.query(
+        "SELECT o.id, o.status, o.total, o.eta, o.delivered_at, o.courier, o.tracking_no, o.payment, o.timeline, "
+        "       json_agg(json_build_object('product_id', p.id, 'name', p.name, 'qty', i.qty)) AS items "
+        "FROM orders o JOIN order_items i ON i.order_id = o.id JOIN products p ON p.id = i.product_id "
+        "WHERE o.customer_id = %s GROUP BY o.id ORDER BY o.created_at DESC", (customer_id,))
+    out = []
+    for r in rows:
+        tl = r["timeline"] or []
+        out.append({"id": r["id"], "status": r["status"], "total_azn": str(r["total"]), "eta": _az_date(r["eta"]),
+                    "delivered_at": _az_date(r["delivered_at"]), "courier": r["courier"], "tracking": r["tracking_no"],
+                    "payment": r["payment"], "last_event": tl[-1]["event"] if tl else None, "items": r["items"]})
+    return out
+
+
+def order_card(order_id: str) -> dict | None:
+    o = db.one("SELECT * FROM orders WHERE upper(id) = upper(%s)", (order_id,))
+    if not o:
+        return None
+    items = db.query("SELECT p.id, p.name, p.category, i.qty, i.price FROM order_items i JOIN products p ON p.id = i.product_id "
+                     "WHERE i.order_id = %s", (o["id"],))
+    rets = db.query("SELECT id, resolution, status FROM returns WHERE order_id = %s ORDER BY created_at DESC", (o["id"],))
+    tks = db.query("SELECT id, team, priority FROM tickets WHERE order_id = %s ORDER BY created_at DESC", (o["id"],))
+    tl = o["timeline"] or []
+    return {"id": o["id"], "status": o["status"], "total": str(o["total"]), "eta": _jsonable(o["eta"]),
+            "delivered_at": _jsonable(o["delivered_at"]), "courier": o["courier"], "tracking": o["tracking_no"],
+            "last_event": tl[-1]["event"] if tl else None,
+            "items": [_clean(i) for i in items], "returns": [_clean(r) for r in rets], "tickets": [_clean(t) for t in tks]}
+
+
+_STOP = {"smart", "simsiz", "dəsti", "nəfərlik", "hissə", "unisex", "konsolu"}
+
+
+def match_order(customer_id: str | None, text: str) -> str | None:
+    """Which of the customer's orders the conversation is about: an explicit ML-#### id, else a product word."""
+    import re
+    m = re.search(r"\b(ML|SB)-?\s?(\d{4})\b", text, re.I)
+    if m:
+        return f"ML-{m.group(2)}"
+    if not customer_id:
+        return None
+    low = text.lower()
+    best, score = None, 0
+    for o in orders_snapshot(customer_id):
+        for it in o["items"]:
+            words = [w.lower().strip(",.()") for w in it["name"].split()]
+            hits = sum(1 for w in words if len(w) >= 4 and w not in _STOP and w[:6] in low)
+            if hits > score:
+                best, score = o["id"], hits
+    return best

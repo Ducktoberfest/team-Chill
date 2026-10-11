@@ -18,7 +18,7 @@ Bu gün: {today}. Kanal: {channel}.
 
 ## İş qaydası
 1. Müştəri tanınmırsa və sifarişlə bağlı sual verirsə: telefon nömrəsini soruş → find_customer.
-2. Müştəri tanınırsa, sifariş nömrəsini SORUŞMA: list_orders çağır, məhsula uyğun sifarişi özün tap, sonra get_order.
+2. Müştəri tanınırsa, sifariş nömrəsini SORUŞMA: aşağıdakı sifariş siyahısından məhsula uyğun sifarişi özün tap.
    Bir cavabda lazım olan bütün tool-ları ardıcıl çağır; müştəriyə "yoxlayıram" deyib dayanma.
    Faktları HƏMİŞƏ tool-lardan götür (get_order, list_orders). Sifariş statusu, tarix, məbləğ uydurma.
 3. Qayda/şərt haqqında danışmazdan əvvəl search_knowledge çağır və yalnız oradakı qaydaya əsaslan.
@@ -80,11 +80,16 @@ ANALYSIS_SCHEMA = {
 }
 
 
-def agent_prompt(channel: str, customer: dict | None) -> str:
+def agent_prompt(channel: str, customer: dict | None, orders: list[dict] | None = None) -> str:
     who = ""
     if customer:
         who = (f"\n## Müştəri (sayta daxil olub, artıq tanınır)\n- id: {customer['id']}, ad: {customer['name']}, "
                f"şəhər: {customer['city']}, telefon: {customer['phone']}\nOna adı ilə müraciət et.")
+    if orders:
+        import json as _json
+        who += ("\n\n## Müştərinin sifarişləri (canlı data, list_orders/get_order çağırmağa ehtiyac yoxdur)\n"
+                + _json.dumps(orders, ensure_ascii=False) +
+                "\nStatus, tarix, kuryer suallarına BİRBAŞA bu datadan cavab ver. get_order yalnız tam tarixçə və ya qaytarma tarixçəsi lazım olanda.")
     return AGENT.format(agent=config.AGENT_NAME, store=config.STORE_NAME,
                         today=datetime.now(BAKU).strftime("%Y-%m-%d %H:%M"), channel=channel,
                         channel_rules=VOICE_RULES if channel == "voice" else WEB_RULES, customer=who)

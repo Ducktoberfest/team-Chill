@@ -541,3 +541,35 @@ img.fly { position: fixed; z-index: 100; object-fit: cover; pointer-events: none
 .acc-check { opacity: 0; color: var(--brand); transition: opacity .2s; } .acc-item.on .acc-check { opacity: 1; }
 .acc-check svg.lucide { width: 16px; height: 16px; }
 @media (max-width: 640px) { .acc-name { display: none; } }
+
+/* ---------- order card beside the support panel ---------- */
+.order-card { position: fixed; z-index: 31; bottom: 24px; right: calc(24px + min(420px, 100vw - 32px) + 16px); width: 290px;
+  border-radius: 24px; overflow: hidden; display: grid;
+  background: linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.68)); -webkit-backdrop-filter: saturate(190%) blur(30px); backdrop-filter: saturate(190%) blur(30px);
+  border: 1px solid rgba(255,255,255,.75); box-shadow: inset 0 1px 0 #fff, 0 30px 70px -20px rgba(16,36,43,.35), 0 4px 12px -4px rgba(16,36,43,.12);
+  opacity: 0; transform: translateX(28px) scale(.94); transition: opacity .45s var(--ease-out), transform .7s var(--spring), filter .25s; }
+.order-card[hidden] { display: none; }
+.order-card.in { opacity: 1; transform: none; }
+.order-card.swap { opacity: .25; filter: blur(6px); transform: scale(.98); }
+.oc-img { height: 150px; background: #fff; overflow: hidden; }
+.oc-img img { width: 100%; height: 100%; object-fit: cover; animation: ocZoom 6s ease-out both; }
+@keyframes ocZoom { from { transform: scale(1.08); } }
+.oc-body { padding: 14px 16px 16px; display: grid; gap: 6px; }
+.oc-top { display: flex; align-items: center; justify-content: space-between; }
+.oc-id { font-weight: 700; font-size: 13px; color: var(--muted); letter-spacing: .02em; }
+.oc-status { font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+.oc-status.ok { background: var(--ok-soft); color: var(--ok); } .oc-status.warn { background: var(--warn-soft); color: var(--warn); }
+.oc-status.info { background: var(--brand-soft); color: var(--brand); } .oc-status.bad { background: var(--bad-soft); color: var(--bad); }
+.oc-status.muted { background: rgba(16,36,43,.06); color: var(--muted); }
+.oc-name { font-weight: 650; font-size: 15px; line-height: 1.3; }
+.oc-name small { color: var(--muted); font-weight: 500; }
+.oc-price { font-weight: 800; font-size: 18px; letter-spacing: -.02em; }
+.oc-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.oc-row svg.lucide { width: 14px; height: 14px; color: var(--brand); }
+.oc-badge { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 650; padding: 7px 10px; border-radius: 12px; animation: msgIn .5s var(--spring) both; }
+.oc-badge.ok { background: var(--ok-soft); color: var(--ok); } .oc-badge.warn { background: var(--warn-soft); color: var(--warn); }
+.oc-badge svg.lucide { width: 14px; height: 14px; }
+.oc-close { position: absolute; top: 10px; right: 10px; z-index: 2; width: 28px; height: 28px; border-radius: 50%; border: 0; display: grid; place-items: center;
+  background: rgba(255,255,255,.8); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.oc-close svg.lucide { width: 14px; height: 14px; }
+@media (max-width: 900px) { .order-card { right: 16px; bottom: calc(min(700px, 100vh - 48px) + 36px); width: min(290px, calc(100vw - 32px)); } }
