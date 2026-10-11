@@ -5,35 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ChillDesk · panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
   <header class="topbar">
-    <div class="logo"><span class="logo-mark">❄</span> ChillDesk</div>
+    <div class="logo"><span class="logo-mark"><i data-lucide="snowflake"></i></span> ChillDesk</div>
     <span class="pill" id="model">Gemma 4</span>
     <div class="spacer"></div>
-    <span class="muted" id="updated"></span>
-    <a class="link" href="/">← Səbət mağazası</a>
+        <a class="link" href="/">Səbət mağazası</a>
   </header>
   <div class="wrap">
     <section class="kpis" id="kpis"></section>
     <div class="cols">
       <section class="box">
-        <h2>🤖 Söhbətlər və avtomatik analiz</h2>
+        <h2><i data-lucide="messages-square"></i> Söhbətlər və avtomatik analiz</h2>
         <div id="convs"></div>
       </section>
       <div style="display:grid;gap:20px;align-content:start">
         <section class="box">
-          <h2>🎫 Biletlər</h2>
+          <h2><i data-lucide="ticket"></i> Biletlər</h2>
           <div id="tickets"></div>
         </section>
         <section class="box">
-          <h2>↩️ Qaytarmalar</h2>
+          <h2><i data-lucide="undo-2"></i> Qaytarmalar</h2>
           <div id="returns"></div>
         </section>
         <section class="box">
-          <h2>🕳️ Bilik bazasında boşluqlar</h2>
+          <h2><i data-lucide="search-x"></i> Bilik bazasında boşluqlar</h2>
           <div id="gaps"></div>
         </section>
       </div>

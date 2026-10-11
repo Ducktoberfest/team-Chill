@@ -1,6 +1,11 @@
 // Səbət demo store + Aysu support widget (web chat over SSE, voice via ElevenLabs).
 const $ = (s) => document.querySelector(s);
-const EMOJI = { "Elektronika": "🎧", "Aksesuar": "🧩", "Məişət texnikası": "🧊", "Ev və tekstil": "🛏️", "Geyim": "🧥" };
+const ICON = { P101: "headphones", P102: "smartphone", P103: "shield", P104: "laptop", P105: "refrigerator", P106: "coffee",
+  P107: "bed-double", P108: "utensils", P109: "shirt", P110: "watch", P111: "bot", P112: "mouse" };
+const icon = (name) => `<i data-lucide="${name}"></i>`;
+const paintIcons = () => window.lucide && window.lucide.createIcons();
+let products = [];
+let cart = 0;
 
 let config = null;
 let conversationId = null;
@@ -38,8 +43,9 @@ function addStep(ev) {
   const el = document.createElement("div");
   el.className = "step";
   const detail = esc(JSON.stringify({ args: ev.args, result: ev.result }, null, 2));
-  el.innerHTML = `<details><summary>⚙️ <b>${esc(ev.name)}</b> · ${esc(ev.label)}</summary><pre>${detail}</pre></details>`;
+  el.innerHTML = `<details><summary>${icon("cpu")} <b>${esc(ev.name)}</b> · ${esc(ev.label)}</summary><pre>${detail}</pre></details>`;
   $("#messages").append(el);
+  paintIcons();
   scroll();
 }
 
@@ -69,7 +75,7 @@ async function send(text) {
   const images = pendingImages; pendingImages = []; $("#preview").innerHTML = "";
   addMsg("user", text, images);
   $("#input").value = "";
-  const typing = addNote("Aysu yazır…");
+  const typing = addNote("Aysu yazır");
   try {
     const res = await fetch("/api/chat", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -92,11 +98,11 @@ async function send(text) {
         if (ev.type === "conversation") conversationId = ev.id;
         else if (ev.type === "tool") { addStep(ev); $("#messages").append(typing); }
         else if (ev.type === "text") addMsg("bot", ev.text);
-        else if (ev.type === "error") addMsg("bot", "⚠️ " + ev.error);
+        else if (ev.type === "error") addMsg("bot", "Xəta: " + ev.error);
       }
     }
   } catch (e) {
-    addMsg("bot", "⚠️ Bağlantı xətası: " + e.message);
+    addMsg("bot", "Bağlantı xətası: " + e.message);
   } finally {
     typing.remove();
     busy = false; $("#send").disabled = false;
@@ -105,12 +111,15 @@ async function send(text) {
 
 async function endConversation(id) {
   if (!id) return;
-  const note = addNote("Söhbət bağlanır, Gemma avtomatik analiz edir…");
+  const note = addNote("Söhbət bağlanır, Gemma analiz edir…");
   const r = await fetch(`/api/conversations/${id}/end`, { method: "POST" }).then((r) => r.json()).catch(() => null);
   note.remove();
   const a = r && r.analysis;
   if (a) {
-    addNote(`✅ Analiz: ${a.category} · ${a.urgency} · ${a.sentiment}${a.auto_ticket ? " · bilet " + a.auto_ticket : ""} — panelə baxın`);
+    const el = document.createElement("div");
+    el.className = "notice";
+    el.innerHTML = `${icon("check")} Analiz: ${esc(a.category)} · ${esc(a.urgency)} · ${esc(a.sentiment)}${a.auto_ticket ? " · bilet " + esc(a.auto_ticket) : ""}`;
+    $("#messages").append(el); paintIcons(); scroll();
   }
 }
 
@@ -125,27 +134,27 @@ async function toggleCall() {
   }).then((r) => r.json());
   const voiceId = start.conversation_id;
   $("#voice-bar").classList.add("on");
-  $("#voice-status").textContent = "Qoşulur…";
+  $("#voice-status").textContent = "Qoşulur";
   try {
     voice = await Conversation.startSession({
       agentId: config.agent_id,
       connectionType: "webrtc",
       customLlmExtraBody: { conversation_id: voiceId, customer_id: $("#customer").value || null },
-      onConnect: () => { $("#voice-status").textContent = "Zəng gedir — danışın"; },
-      onModeChange: ({ mode }) => { $("#voice-status").textContent = mode === "speaking" ? "Aysu danışır…" : "Dinləyir…"; },
+      onConnect: () => { $("#voice-status").textContent = "Danışın, Aysu dinləyir"; },
+      onModeChange: ({ mode }) => { $("#voice-status").textContent = mode === "speaking" ? "Aysu danışır" : "Aysu dinləyir"; },
       onMessage: ({ source, message }) => addMsg(source === "user" ? "user" : "bot", message),
-      onError: (e) => addMsg("bot", "⚠️ Səs xətası: " + (e?.message || e)),
+      onError: (e) => addMsg("bot", "Səs xətası: " + (e?.message || e)),
       onDisconnect: () => {
         voice = null;
         $("#voice-bar").classList.remove("on");
-        $("#call").textContent = "📞";
+        $("#call").innerHTML = icon("phone"); paintIcons();
         endConversation(voiceId);
       },
     });
-    $("#call").textContent = "⏹";
+    $("#call").innerHTML = icon("phone-off"); paintIcons();
   } catch (e) {
     $("#voice-bar").classList.remove("on");
-    addMsg("bot", "⚠️ Mikrofona icazə lazımdır və ya səs xidməti əlçatmazdır: " + e.message);
+    addMsg("bot", "Mikrofona icazə lazımdır və ya səs xidməti əlçatmazdır: " + e.message);
   }
 }
 
@@ -154,18 +163,44 @@ async function boot() {
   config = await fetch("/api/config").then((r) => r.json());
   $("#model-label").textContent = `${config.model} · ${config.embed_model}`;
   for (const c of config.customers) $("#customer").append(new Option(`${c.name} (${c.city})`, c.id));
-  const products = await fetch("/api/products").then((r) => r.json());
-  $("#products").innerHTML = products.map((p) => `
-    <article class="card">
-      <div class="thumb">${EMOJI[p.category] || "📦"}</div>
-      <div class="cat">${esc(p.category)}</div>
-      <div class="name">${esc(p.name)}</div>
-      <div class="price">${p.price.toFixed(2)} ₼</div>
-    </article>`).join("");
-  addMsg("bot", "Salam! Mən Aysu, Səbət-in dəstək agentiyəm. Sifariş, çatdırılma, qaytarma — nə lazımdırsa yazın. Zədəli məhsulun şəklini də göndərə bilərsiniz 📎");
+  products = await fetch("/api/products").then((r) => r.json());
+  const cats = ["Hamısı", ...new Set(products.map((p) => p.category))];
+  $("#cats").innerHTML = cats.map((c, i) => `<button class="cat-btn${i ? "" : " on"}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  renderProducts("Hamısı");
+  addMsg("bot", "Salam! Mən Aysu, Səbət-in dəstək agentiyəm. Sifariş, çatdırılma, qaytarma: nə lazımdırsa yazın. Zədəli məhsulun şəklini də göndərə bilərsiniz.");
+  paintIcons();
 }
 
-$("#fab").onclick = () => { $("#panel").classList.add("open"); $("#fab").style.display = "none"; $("#input").focus(); };
+function renderProducts(cat) {
+  const list = cat === "Hamısı" ? products : products.filter((p) => p.category === cat);
+  $("#products-grid").innerHTML = list.map((p) => `
+    <article class="card glass">
+      <div class="thumb">${icon(ICON[p.id] || "package")}</div>
+      <div class="cat">${esc(p.category)}</div>
+      <div class="name">${esc(p.name)}</div>
+      <div class="row">
+        <div><div class="price">${p.price.toLocaleString("az-AZ", { minimumFractionDigits: 0 })} ₼</div>
+          <div class="stock${p.stock < 8 ? " low" : ""}">${p.stock < 8 ? `Son ${p.stock} ədəd` : "Stokda var"}</div></div>
+        <button class="add" title="Səbətə at">${icon("plus")}</button>
+      </div>
+    </article>`).join("");
+  paintIcons();
+}
+
+function openPanel() { $("#panel").classList.add("open"); $("#fab").style.display = "none"; $("#input").focus(); }
+
+$("#cats").addEventListener("click", (e) => {
+  const b = e.target.closest(".cat-btn"); if (!b) return;
+  document.querySelectorAll(".cat-btn").forEach((x) => x.classList.toggle("on", x === b));
+  renderProducts(b.dataset.cat);
+});
+$("#products-grid").addEventListener("click", (e) => {
+  const b = e.target.closest(".add");
+  if (b) { $("#cart-count").textContent = ++cart; b.innerHTML = icon("check"); paintIcons(); }
+});
+$("#hero-aysu").onclick = openPanel;
+$("#band-aysu").onclick = openPanel;
+$("#fab").onclick = openPanel;
 $("#close").onclick = () => { $("#panel").classList.remove("open"); $("#fab").style.display = ""; };
 $("#send").onclick = () => send($("#input").value);
 $("#input").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send($("#input").value); } });

@@ -5,7 +5,7 @@ const time = (t) => new Date(t).toLocaleString("az-AZ", { hour: "2-digit", minut
 const tag = (v, cls = v) => v ? `<span class="tag ${esc(cls)}">${esc(v)}</span>` : "";
 
 async function analyze(id, btn) {
-  btn.disabled = true; btn.textContent = "Gemma analiz edir…";
+  btn.disabled = true; btn.textContent = "Gemma analiz edir";
   await fetch(`/api/conversations/${id}/end`, { method: "POST" });
   load();
 }
@@ -17,15 +17,15 @@ function conv(c) {
     ${tag(c.channel === "voice" ? "səs" : "chat", c.channel)} <span class="muted">${esc(c.id)} · ${c.n_messages} mesaj</span>
     <span class="time">${time(c.updated_at)}</span></div>`;
   if (!a) {
-    return `<div class="conv">${head}<div><button class="btn ghost" onclick="analyze('${esc(c.id)}', this)">⚡ İndi analiz et</button>
-      <span class="muted">— boş qalan söhbətlər 90 saniyədən sonra avtomatik analiz olunur</span></div></div>`;
+    return `<div class="conv">${head}<div><button class="btn ghost" onclick="analyze('${esc(c.id)}', this)"><i data-lucide="zap"></i> İndi analiz et</button>
+      <span class="muted">Boş qalan söhbətlər 90 saniyədən sonra avtomatik analiz olunur.</span></div></div>`;
   }
   return `<div class="conv">${head}
     <div>${tag(a.category, "")} ${tag(a.urgency)} ${tag(a.sentiment)} ${a.resolved ? tag("həll olundu", "ok") : tag("açıq", "medium")}
       ${a.auto_ticket ? tag("avto-bilet " + a.auto_ticket, "P2") : ""}</div>
     <div>${esc(a.summary)}</div>
-    ${a.action_items?.length ? `<ul class="actions">${a.action_items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
-    <details><summary class="muted">✉️ Follow-up email: <b>${esc(a.follow_up_email?.subject)}</b></summary>
+    ${a.action_items?.filter(Boolean).length ? `<ul class="actions">${a.action_items.filter(Boolean).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    <details><summary class="muted"><i data-lucide="mail"></i> Follow-up email: <b>${esc(a.follow_up_email?.subject)}</b></summary>
       <div class="email">${esc(a.follow_up_email?.body)}</div></details>
   </div>`;
 }
@@ -45,12 +45,12 @@ async function load() {
     : `<div class="empty">Bilet yoxdur.</div>`;
   $("#returns").innerHTML = d.returns.length ? `<table><tr><th>Müraciət</th><th>Məhsul</th><th>Qərar</th></tr>${d.returns.map((r) => `
     <tr><td><b>${esc(r.id)}</b><br><span class="muted">${esc(r.order_id)}</span></td>
-    <td>${esc(r.product)}<br><span class="muted">${esc(r.reason)}${r.photo_assessment ? " · 📷 " + esc(r.photo_assessment) : ""}</span></td>
+    <td>${esc(r.product)}<br><span class="muted">${esc(r.reason)}${r.photo_assessment ? " · Şəkil: " + esc(r.photo_assessment) : ""}</span></td>
     <td>${tag(r.resolution, r.resolution === "review" ? "medium" : "ok")}</td></tr>`).join("")}</table>`
     : `<div class="empty">Qaytarma yoxdur.</div>`;
   $("#gaps").innerHTML = d.kb_gaps.length ? `<ul class="actions">${d.kb_gaps.map((g) => `<li>${esc(g)}</li>`).join("")}</ul>`
     : `<div class="empty">Boşluq tapılmadı.</div>`;
-  $("#updated").textContent = "yeniləndi " + new Date().toLocaleTimeString("az-AZ");
+  window.lucide && window.lucide.createIcons();
 }
 
 fetch("/api/config").then((r) => r.json()).then((c) => { $("#model").textContent = `${c.model} · ${c.embed_model} · Neon`; });

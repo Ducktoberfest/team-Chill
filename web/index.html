@@ -3,39 +3,97 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Səbət · dəstək Aysu ilə</title>
+  <title>Səbət · hər şey bir Səbətdə</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
   <header class="topbar">
-    <div class="logo"><span class="logo-mark">S</span> Səbət</div>
-    <span class="pill">demo mağaza</span>
+    <div class="logo"><span class="logo-mark"><i data-lucide="shopping-bag"></i></span> Səbət</div>
+    <nav class="nav-links">
+      <a href="#products">Məhsullar</a>
+      <a href="#aysu">Dəstək</a>
+      <a href="#reviews">Rəylər</a>
+    </nav>
     <div class="spacer"></div>
-    <label class="muted" for="customer">Daxil olan müştəri:</label>
-    <select id="customer" class="select"><option value="">— qonaq —</option></select>
-    <a class="link" href="/dashboard">ChillDesk paneli →</a>
+    <label class="select-wrap" title="Hesab">
+      <i data-lucide="user"></i>
+      <select id="customer" class="select"><option value="">Qonaq</option></select>
+    </label>
+    <span class="cart"><i data-lucide="shopping-bag"></i><b id="cart-count">0</b></span>
+    <a class="link" href="/dashboard">ChillDesk</a>
   </header>
 
-  <section class="hero">
-    <h1>Hər şey bir Səbətdə.</h1>
-    <p>Elektronika, ev və geyim — Bakı daxilində 1–2 günə çatdırılma. Sualınız var? Aysu 24/7 yazılı və səsli cavab verir.</p>
-  </section>
+  <main class="page">
+    <section class="hero glass">
+      <div>
+        <div class="eyebrow">Yeni · Nova X12</div>
+        <h1>Sevdiyin hər şey.<br><span>Bir Səbətdə.</span></h1>
+        <p>Elektronika, ev və geyim. Bakıda 1–2 günə pulsuz çatdırılma, 14 günlük asan qaytarma. Sualın olsa, Aysu gecə-gündüz yazılı və səsli cavab verir.</p>
+        <div class="ctas">
+          <a class="btn" href="#products">Alış-verişə başla</a>
+          <button class="btn ghost" id="hero-aysu"><i data-lucide="sparkles"></i> Aysu ilə danış</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="phone"><div class="screen"><div class="island"></div></div></div>
+        <div class="tag-price">Nova X12 256GB<b>1 149 ₼ · 0% 12 ay</b></div>
+      </div>
+    </section>
 
-  <main id="products" class="grid"></main>
+    <section class="trust">
+      <div class="item glass"><span class="ic"><i data-lucide="truck"></i></span><div><b>Pulsuz çatdırılma</b><span>50 ₼-dan yuxarı, Bakıda 1–2 gün</span></div></div>
+      <div class="item glass"><span class="ic"><i data-lucide="undo-2"></i></span><div><b>14 gün qaytarma</b><span>Zədəli məhsul pulsuz dəyişdirilir</span></div></div>
+      <div class="item glass"><span class="ic"><i data-lucide="shield-check"></i></span><div><b>36 aya qədər zəmanət</b><span>Rəsmi servis mərkəzi</span></div></div>
+      <div class="item glass"><span class="ic"><i data-lucide="credit-card"></i></span><div><b>0% hissə-hissə</b><span>BirKart ilə 3, 6, 12 ay</span></div></div>
+    </section>
 
-  <button id="fab" class="fab"><span class="dot"></span> Aysu ilə danış</button>
+    <div class="section-head" id="products">
+      <div><h2>Hamının sevdikləri.</h2><p>Seçilmiş məhsullar.</p></div>
+      <div class="cats" id="cats"></div>
+    </div>
+    <section id="products-grid" class="grid"></section>
+
+    <section class="ai-band" id="aysu">
+      <div>
+        <div class="eyebrow">ChillDesk ilə</div>
+        <h2>Tanış ol: Aysu.<br>Sənin şəxsi dəstək agentin.</h2>
+        <p>Aysu açıq çəkili Gemma 4 modeli ilə işləyir: sifarişini tapır, şəkli oxuyur, qaytarmanı dərhal açır, lazım olsa əməkdaşa ötürür. Yazılı və ya səsli, gecə-gündüz.</p>
+        <button class="btn" id="band-aysu" style="margin-top:8px">Aysu ilə danış</button>
+      </div>
+      <div class="ai-feats">
+        <div class="ai-feat"><span class="ic"><i data-lucide="camera"></i></span><div><b>Şəkil göndər, həll al</b><span>Zədəli məhsulun şəklini göndər, Aysu görür və dəyişdirməni açır.</span></div></div>
+        <div class="ai-feat"><span class="ic"><i data-lucide="phone"></i></span><div><b>Səsli zəng</b><span>Azərbaycan, rus və ingilis dillərində təbii səs.</span></div></div>
+        <div class="ai-feat"><span class="ic"><i data-lucide="zap"></i></span><div><b>Saniyələr içində</b><span>Sifariş statusu, çatdırılma, qaytarma, növbə gözləmədən.</span></div></div>
+      </div>
+    </section>
+
+    <div class="section-head" id="reviews"><div><h2>Müştərilər nə deyir.</h2></div></div>
+    <section class="reviews">
+      <div class="review glass"><div class="stars"></div><p>Qulaqlıq zədəli gəlmişdi, şəklini Aysuya göndərdim, bir dəqiqəyə dəyişdirmə açıldı.</p><small>Leyla M. · Bakı</small></div>
+      <div class="review glass"><div class="stars"></div><p>Gecə saat 2-də soyuducunun harada olduğunu soruşdum, dərhal izləmə nömrəsi ilə cavab gəldi.</p><small>Rəşad Ə. · Sumqayıt</small></div>
+      <div class="review glass"><div class="stars" data-n="4"></div><p>Səsli zəng çox rahatdır, nənəm də istifadə edə bilir.</p><small>Nigar H. · Bakı</small></div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2026 Səbət. Fiktiv demo mağaza, bütün məlumatlar sintetikdir.</span>
+    <span>ChillDesk · Gemma 4 · EmbeddingGemma · Neon · ElevenLabs</span>
+  </footer>
+
+  <button id="fab" class="fab"><span class="avatar">A</span><span>Aysu ilə danış</span></button>
 
   <section id="panel" class="panel" aria-label="Dəstək">
     <div class="panel-head">
       <div class="avatar">A</div>
-      <div class="who"><b>Aysu</b><br><small id="model-label">Gemma 4</small></div>
-      <button id="call" class="icon-btn" title="Səsli zəng">📞</button>
-      <button id="end" class="icon-btn" title="Söhbəti bitir">✓</button>
-      <button id="close" class="icon-btn" title="Bağla">✕</button>
+      <div class="who"><b>Aysu</b> · Səbət dəstək<br><small id="model-label">Gemma 4</small></div>
+      <button id="call" class="icon-btn" title="Səsli zəng"><i data-lucide="phone"></i></button>
+      <button id="end" class="icon-btn" title="Söhbəti bitir"><i data-lucide="check"></i></button>
+      <button id="close" class="icon-btn" title="Bağla"><i data-lucide="x"></i></button>
     </div>
-    <div id="voice-bar" class="voice-bar"><span class="pulse"></span><span id="voice-status">Zəng gedir…</span></div>
+    <div id="voice-bar" class="voice-bar"><span class="pulse"></span><span id="voice-status">Zəng</span></div>
     <div id="messages" class="messages"></div>
     <div class="composer">
       <div id="chips" class="chips">
@@ -45,9 +103,9 @@
       </div>
       <div id="preview" class="preview"></div>
       <div class="row">
-        <label class="btn ghost" title="Şəkil əlavə et">📎<input id="file" type="file" accept="image/*" multiple hidden></label>
-        <textarea id="input" rows="1" placeholder="Mesaj yazın və ya şəkil göndərin…"></textarea>
-        <button id="send" class="btn">➤</button>
+        <label class="btn ghost" title="Şəkil əlavə et"><i data-lucide="paperclip"></i><input id="file" type="file" accept="image/*" multiple hidden></label>
+        <textarea id="input" rows="1" placeholder="Mesaj yazın və ya şəkil göndərin"></textarea>
+        <button id="send" class="btn" title="Göndər"><i data-lucide="arrow-up"></i></button>
       </div>
     </div>
   </section>
