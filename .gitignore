@@ -7,3 +7,4 @@ node_modules/
 training/out/ckpt/
 training/out/*.gguf
 training/unsloth_compiled_cache/
+.run/
