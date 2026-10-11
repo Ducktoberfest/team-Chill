@@ -81,6 +81,10 @@ Open <http://localhost:8000> (store and agent) and <http://localhost:8000/dashbo
 
 All code in this repository was written on 11 Oct 2026 during Ducktoberfest Baku. The git history shows the timeline. In line with MLH rules on AI tools: we used **Claude Code** as an AI coding assistant during the build.
 
+## Credits
+
+Product photos are openly licensed (CC0 / CC BY) images from [Openverse](https://openverse.org). See [CREDITS.md](CREDITS.md) for authors and licenses.
+
 ## License
 
 [MIT](LICENSE) © 2026 team-Chill

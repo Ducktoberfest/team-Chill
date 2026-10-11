@@ -175,7 +175,8 @@ function renderProducts(cat) {
   const list = cat === "Hamısı" ? products : products.filter((p) => p.category === cat);
   $("#products-grid").innerHTML = list.map((p) => `
     <article class="card glass">
-      <div class="thumb">${icon(ICON[p.id] || "package")}</div>
+      <div class="thumb"><img src="/static/img/${esc(p.id)}.jpg" alt="${esc(p.name)}" loading="lazy"
+        onerror="this.replaceWith(Object.assign(document.createElement('i'), {dataset: {lucide: '${ICON[p.id] || "package"}'}})); window.lucide && lucide.createIcons();"></div>
       <div class="cat">${esc(p.category)}</div>
       <div class="name">${esc(p.name)}</div>
       <div class="row">

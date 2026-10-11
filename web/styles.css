@@ -326,3 +326,7 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.9; flex: none; }
 }
 .phone .island { position: absolute; top: 3%; left: 50%; transform: translateX(-50%); width: 34%; height: 4%; border-radius: 999px; background: #000; }
 @keyframes float { 50% { transform: rotate(-6deg) translateY(-12px); } }
+
+.card .thumb { overflow: hidden; padding: 0; }
+.card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+.card:hover .thumb img { transform: scale(1.05); }
