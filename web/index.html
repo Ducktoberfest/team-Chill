@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Səbət · dəstək Aysu ilə</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo"><span class="logo-mark">S</span> Səbət</div>
+    <span class="pill">demo mağaza</span>
+    <div class="spacer"></div>
+    <label class="muted" for="customer">Daxil olan müştəri:</label>
+    <select id="customer" class="select"><option value="">— qonaq —</option></select>
+    <a class="link" href="/dashboard">ChillDesk paneli →</a>
+  </header>
+
+  <section class="hero">
+    <h1>Hər şey bir Səbətdə.</h1>
+    <p>Elektronika, ev və geyim — Bakı daxilində 1–2 günə çatdırılma. Sualınız var? Aysu 24/7 yazılı və səsli cavab verir.</p>
+  </section>
+
+  <main id="products" class="grid"></main>
+
+  <button id="fab" class="fab"><span class="dot"></span> Aysu ilə danış</button>
+
+  <section id="panel" class="panel" aria-label="Dəstək">
+    <div class="panel-head">
+      <div class="avatar">A</div>
+      <div class="who"><b>Aysu</b><br><small id="model-label">Gemma 4</small></div>
+      <button id="call" class="icon-btn" title="Səsli zəng">📞</button>
+      <button id="end" class="icon-btn" title="Söhbəti bitir">✓</button>
+      <button id="close" class="icon-btn" title="Bağla">✕</button>
+    </div>
+    <div id="voice-bar" class="voice-bar"><span class="pulse"></span><span id="voice-status">Zəng gedir…</span></div>
+    <div id="messages" class="messages"></div>
+    <div class="composer">
+      <div id="chips" class="chips">
+        <button class="chip">Sifarişim haradadır?</button>
+        <button class="chip">Qulaqlığım zədəli gəlib</button>
+        <button class="chip">Pulum nə vaxt qayıdır?</button>
+      </div>
+      <div id="preview" class="preview"></div>
+      <div class="row">
+        <label class="btn ghost" title="Şəkil əlavə et">📎<input id="file" type="file" accept="image/*" multiple hidden></label>
+        <textarea id="input" rows="1" placeholder="Mesaj yazın və ya şəkil göndərin…"></textarea>
+        <button id="send" class="btn">➤</button>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>
