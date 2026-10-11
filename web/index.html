@@ -6,7 +6,7 @@
   <title>Səbət · hər şey bir Səbətdə</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=4">
+  <link rel="stylesheet" href="/static/styles.css?v=6">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script type="importmap">
     { "imports": {
@@ -68,13 +68,10 @@
         <p>Aysu açıq çəkili Gemma 4 modeli ilə işləyir: sifarişini tapır, şəkli oxuyur, qaytarmanı dərhal açır, lazım olsa əməkdaşa ötürür. Yazılı və ya səsli, gecə-gündüz.</p>
         <button class="btn" id="band-aysu" style="margin-top:8px">Aysu ilə danış</button>
       </div>
-      <div class="ai-side">
-      <div id="aysu-hero" class="aysu-hero"></div>
       <div class="ai-feats">
         <div class="ai-feat"><span class="ic"><i data-lucide="camera"></i></span><div><b>Şəkil göndər, həll al</b><span>Zədəli məhsulun şəklini göndər, Aysu görür və dəyişdirməni açır.</span></div></div>
         <div class="ai-feat"><span class="ic"><i data-lucide="phone"></i></span><div><b>Səsli zəng</b><span>Azərbaycan, rus və ingilis dillərində təbii səs.</span></div></div>
         <div class="ai-feat"><span class="ic"><i data-lucide="zap"></i></span><div><b>Saniyələr içində</b><span>Sifariş statusu, çatdırılma, qaytarma, növbə gözləmədən.</span></div></div>
-      </div>
       </div>
     </section>
 
@@ -101,8 +98,14 @@
       <button id="end" class="icon-btn" title="Söhbəti bitir"><i data-lucide="check"></i></button>
       <button id="close" class="icon-btn" title="Bağla"><i data-lucide="x"></i></button>
     </div>
-    <div id="aysu-stage" class="stage"></div>
-    <div id="voice-bar" class="voice-bar"><span class="pulse"></span><span id="voice-status">Zəng</span></div>
+    <div id="call-screen" class="call-screen" hidden>
+      <div id="aysu-stage" class="stage"></div>
+      <div class="ringer">
+        <div class="rings"><span></span><span></span><span></span><div class="avatar big">A</div></div>
+      </div>
+      <div class="call-info"><b>Aysu</b><span id="voice-status">Zəng edilir</span><span id="call-timer" class="timer"></span></div>
+      <button id="hangup" class="hangup" title="Zəngi bitir"><i data-lucide="phone-off"></i></button>
+    </div>
     <div id="messages" class="messages"></div>
     <div class="composer">
       <div id="chips" class="chips">
@@ -119,6 +122,6 @@
     </div>
   </section>
 
-  <script type="module" src="/static/app.js?v=5"></script>
+  <script type="module" src="/static/app.js?v=6"></script>
 </body>
 </html>

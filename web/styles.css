@@ -331,13 +331,37 @@ svg.lucide { width: 18px; height: 18px; stroke-width: 1.9; flex: none; }
 .card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
 .card:hover .thumb img { transform: scale(1.05); }
 
-/* ---------- Aysu 3D ---------- */
-.stage { height: 190px; flex: none; position: relative; border-bottom: 1px solid var(--line);
-  background: radial-gradient(70% 90% at 50% 100%, rgba(94, 92, 230, .18), transparent 70%),
-              radial-gradient(60% 70% at 80% 10%, rgba(255, 55, 95, .10), transparent 70%); transition: height .35s ease; }
-.panel.calling .stage { height: 330px; }
-.stage canvas, .aysu-hero canvas { display: block; }
-.ai-side { display: grid; gap: 12px; }
-.aysu-hero { height: 300px; border-radius: 24px; overflow: hidden;
-  background: radial-gradient(70% 80% at 50% 100%, rgba(94, 92, 230, .45), transparent 70%), rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.12); }
+/* ---------- voice call screen ---------- */
+.call-screen { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #fff; overflow: hidden; animation: callIn .45s cubic-bezier(.2, .8, .2, 1);
+  background: radial-gradient(80% 60% at 50% 30%, rgba(94, 92, 230, .55), transparent 70%),
+              radial-gradient(70% 50% at 50% 100%, rgba(255, 55, 95, .35), transparent 70%),
+              linear-gradient(180deg, #14142b, #1d1d3a 60%, #24152b); }
+.call-screen[hidden] { display: none; }
+@keyframes callIn { from { opacity: 0; transform: scale(1.04); } }
+.call-screen.closing { animation: callOut .35s ease forwards; }
+@keyframes callOut { to { opacity: 0; transform: scale(.98); } }
+.stage { position: absolute; inset: 0 0 150px 0; opacity: 0; transition: opacity .9s ease; }
+.call-screen.connected .stage { opacity: 1; }
+.stage canvas { display: block; }
+.ringer { position: relative; width: 150px; height: 150px; margin-bottom: 28px; transition: opacity .6s, transform .6s; }
+.call-screen.connected .ringer { opacity: 0; transform: scale(.85); pointer-events: none; }
+.rings { position: absolute; inset: 0; display: grid; place-items: center; }
+.rings span { position: absolute; width: 110px; height: 110px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .35);
+  animation: ring 2.4s cubic-bezier(.2, .6, .3, 1) infinite; }
+.rings span:nth-child(2) { animation-delay: .8s; }
+.rings span:nth-child(3) { animation-delay: 1.6s; }
+@keyframes ring { from { transform: scale(.9); opacity: .9; } to { transform: scale(2.1); opacity: 0; } }
+.avatar.big { width: 110px; height: 110px; font-size: 42px; position: relative; box-shadow: 0 20px 60px rgba(94, 92, 230, .6);
+  animation: breathe 2.4s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.04); } }
+.call-info { position: absolute; bottom: 92px; left: 0; right: 0; display: grid; justify-items: center; gap: 2px; text-align: center; }
+.call-screen:not(.connected) .call-info { position: static; margin-bottom: 40px; }
+.call-info b { font-size: 24px; font-weight: 700; letter-spacing: -.02em; }
+.call-info span { font-size: 14px; color: rgba(255, 255, 255, .7); }
+.call-info .timer { font-variant-numeric: tabular-nums; }
+.hangup { position: absolute; bottom: 24px; width: 58px; height: 58px; border-radius: 50%; border: 0; background: #ff3b30; color: #fff;
+  display: grid; place-items: center; box-shadow: 0 10px 30px rgba(255, 59, 48, .45); transition: transform .15s; }
+.hangup:hover { transform: scale(1.06); }
+.hangup svg.lucide { width: 24px; height: 24px; }
+.panel .call-screen { border-radius: 28px; }

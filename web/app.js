@@ -102,7 +102,7 @@ async function send(text) {
         const ev = JSON.parse(data);
         if (ev.type === "conversation") conversationId = ev.id;
         else if (ev.type === "tool") { addStep(ev); $("#messages").append(typing); reactToTool(ev); }
-        else if (ev.type === "text") { addMsg("bot", ev.text); aysu?.speakText(ev.text.replace(/[*#_`]/g, "")); }
+        else if (ev.type === "text") addMsg("bot", ev.text);
         else if (ev.type === "error") { addMsg("bot", "Xəta: " + ev.error); aysu?.setEmotion("concerned"); aysu?.setState("idle"); }
       }
     }
@@ -137,50 +137,103 @@ async function endConversation(id) {
 }
 
 // ---------------------------------------------------------------- voice (ElevenLabs Conversational AI)
+// Ringback tone like a real phone line: 425 Hz, 1 s on / 3 s off.
+function startRingback() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const gain = ctx.createGain(); gain.gain.value = 0; gain.connect(ctx.destination);
+  const osc = ctx.createOscillator(); osc.frequency.value = 425; osc.connect(gain); osc.start();
+  const beep = (t) => {
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.18, t + 0.03);
+    gain.gain.setValueAtTime(0.18, t + 1.0);
+    gain.gain.linearRampToValueAtTime(0, t + 1.05);
+  };
+  let next = ctx.currentTime + 0.25;
+  beep(next);
+  const timer = setInterval(() => { next += 4; beep(next); }, 4000);
+  return () => { clearInterval(timer); gain.gain.cancelScheduledValues(ctx.currentTime); gain.gain.value = 0; setTimeout(() => ctx.close(), 100); };
+}
+
+let callTimer = null;
+function setCallStatus(t) { $("#voice-status").textContent = t; }
+
+function closeCallScreen() {
+  const cs = $("#call-screen");
+  clearInterval(callTimer); callTimer = null;
+  cs.classList.add("closing");
+  setTimeout(() => { cs.hidden = true; cs.classList.remove("closing", "connected"); $("#call-timer").textContent = ""; }, 350);
+}
+
+let calling = false;
+let cancelCall = null;   // set while ringing; hanging up before Aysu answers cancels the call
 async function toggleCall() {
   if (voice) { await voice.endSession(); return; }
-  if (!config.agent_id) { addMsg("bot", "Səsli agent qurulmayıb (ELEVENLABS_AGENT_ID)."); return; }
-  const { Conversation } = await import("https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.27.0/+esm");
-  const start = await fetch("/api/voice/start", {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ customer_id: $("#customer").value || null }),
-  }).then((r) => r.json());
-  const voiceId = start.conversation_id;
-  $("#voice-bar").classList.add("on");
-  $("#voice-status").textContent = "Qoşulur";
+  if (calling) return;
+  if (!config.agent_id) { addMsg("bot", "Səsli agent qurulmayıb."); return; }
+  calling = true;
+  const cs = $("#call-screen");
+  cs.hidden = false; setCallStatus("Zəng edilir");
+  const stopRing = startRingback();
+  const ringStarted = performance.now();
+  let stopped = false;
+  const stopRingOnce = () => { if (!stopped) { stopped = true; stopRing(); } };
+  let cancelled = false;
+  cancelCall = () => { cancelled = true; stopRingOnce(); calling = false; closeCallScreen(); };
   try {
-    voice = await Conversation.startSession({
+    // load Aysu, the SDK and a conversation id while the line rings
+    if (!aysu) {
+      aysu = new AysuAvatar($("#aysu-stage"), { src: avatarSrc, framing: "bust" });
+      aysu.load().catch((e) => console.warn("avatar", e));
+    }
+    const [{ Conversation }, start] = await Promise.all([
+      import("https://cdn.jsdelivr.net/npm/@elevenlabs/client@1.27.0/+esm"),
+      fetch("/api/voice/start", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customer_id: $("#customer").value || null }) }).then((r) => r.json()),
+    ]);
+    const voiceId = start.conversation_id;
+    // let at least one full "duut" play before Aysu picks up
+    await new Promise((r) => setTimeout(r, Math.max(0, 2600 - (performance.now() - ringStarted))));
+    if (cancelled) return;
+    const session = await Conversation.startSession({
       agentId: config.agent_id,
       connectionType: "webrtc",
       textOnly: false,
       customLlmExtraBody: { conversation_id: voiceId, customer_id: $("#customer").value || null },
       onConnect: () => {
-        $("#voice-status").textContent = "Danışın, Aysu dinləyir";
-        $("#panel").classList.add("calling");
-        setTimeout(() => aysu?.frame("bust"), 360);
+        stopRingOnce();
+        cs.classList.add("connected");
+        setCallStatus("Qoşuldu");
+        const t0 = Date.now();
+        callTimer = setInterval(() => {
+          const s = Math.floor((Date.now() - t0) / 1000);
+          $("#call-timer").textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+        }, 1000);
         aysu?.useFrequencySource(() => voice && voice.getOutputByteFrequencyData());
         aysu?.setState("listening");
       },
       onModeChange: ({ mode }) => {
-        $("#voice-status").textContent = mode === "speaking" ? "Aysu danışır" : "Aysu dinləyir";
+        setCallStatus(mode === "speaking" ? "Aysu danışır" : "Aysu dinləyir");
         aysu?.setState(mode === "speaking" ? "speaking" : "listening");
       },
       onMessage: ({ source, message }) => addMsg(source === "user" ? "user" : "bot", message),
       onError: (e) => addMsg("bot", "Səs xətası: " + (e?.message || e)),
       onDisconnect: () => {
-        voice = null;
+        voice = null; calling = false; cancelCall = null;
+        stopRingOnce();
         aysu?.stopAudio(); aysu?.setState("idle");
-        $("#panel").classList.remove("calling");
-        setTimeout(() => aysu?.frame("face"), 360);
-        $("#voice-bar").classList.remove("on");
-        $("#call").innerHTML = icon("phone"); paintIcons();
+        closeCallScreen();
         endConversation(voiceId);
       },
     });
-    $("#call").innerHTML = icon("phone-off"); paintIcons();
+    if (cancelled) { await session.endSession(); return; }
+    voice = session;
+    cancelCall = null;
   } catch (e) {
-    $("#voice-bar").classList.remove("on");
-    addMsg("bot", "Mikrofona icazə lazımdır və ya səs xidməti əlçatmazdır: " + e.message);
+    if (cancelled) return;
+    stopRingOnce();
+    calling = false;
+    closeCallScreen();
+    addMsg("bot", "Zəng qoşulmadı. Mikrofona icazə verin və yenidən cəhd edin. (" + e.message + ")");
   }
 }
 
@@ -214,21 +267,8 @@ function renderProducts(cat) {
   paintIcons();
 }
 
-function openPanel() {
-  $("#panel").classList.add("open"); $("#fab").style.display = "none"; $("#input").focus();
-  if (!aysu) {
-    aysu = new AysuAvatar($("#aysu-stage"), { src: avatarSrc, framing: "face" });
-    aysu.load().catch((e) => { console.warn("avatar", e); $("#aysu-stage").style.display = "none"; aysu = null; });
-  }
-}
+function openPanel() { $("#panel").classList.add("open"); $("#fab").style.display = "none"; $("#input").focus(); }
 
-// large Aysu in the "Tanış ol" band, created when it scrolls into view
-new IntersectionObserver(([e], obs) => {
-  if (!e.isIntersecting) return;
-  obs.disconnect();
-  new AysuAvatar($("#aysu-hero"), { src: avatarSrc, framing: "bust" }).load()
-    .catch((err) => { console.warn("avatar", err); $("#aysu-hero").style.display = "none"; });
-}, { rootMargin: "200px" }).observe($("#aysu-hero"));
 
 $("#cats").addEventListener("click", (e) => {
   const b = e.target.closest(".cat-btn"); if (!b) return;
@@ -254,6 +294,7 @@ $("#file").addEventListener("change", async (e) => {
 });
 $("#end").onclick = async () => { const id = conversationId; conversationId = null; await endConversation(id); };
 $("#call").onclick = toggleCall;
+$("#hangup").onclick = () => { if (voice) voice.endSession(); else if (cancelCall) cancelCall(); };
 $("#customer").addEventListener("change", () => { conversationId = null; $("#messages").innerHTML = ""; addMsg("bot", "Yeni söhbət. Necə kömək edə bilərəm?"); });
 
 boot();
