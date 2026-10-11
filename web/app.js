@@ -236,7 +236,7 @@ let sttMode = false, micStream = null, recorder = null, chunks = [];
 function setSttMode(on) {
   sttMode = on && !!config.stt;
   voice?.setMicMuted(sttMode);
-  $("#ptt").hidden = !sttMode; $("#ptt-hint").hidden = !sttMode;
+  $("#ptt").hidden = !sttMode; $("#ptt-hint").hidden = true;   // only the mic button on screen
   $("#stt-toggle").classList.toggle("on", sttMode);
   $("#stt-toggle").textContent = sttMode ? "GPT STT" : "ElevenLabs STT";
 }
