@@ -37,7 +37,9 @@ async function load() {
     [k.conversations, "söhbət"], [k.analyzed, "Gemma tərəfindən analiz"], [k.auto_resolved, "agent özü həll etdi"],
     [k.open_tickets, "açıq bilet"], [k.returns, "qaytarma müraciəti"], [k.negative, "narazı müştəri"],
   ];
-  $("#kpis").innerHTML = items.map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+  const first = !$("#kpis").children.length;
+  $("#kpis").innerHTML = items.map(([v, l], i) => `<div class="kpi" style="animation-delay:${i * 70}ms"><div class="v" data-to="${v}">${first ? 0 : v}</div><div class="l">${l}</div></div>`).join("");
+  if (first) countUp();
   $("#convs").innerHTML = d.conversations.map(conv).join("") || `<div class="empty">Hələ söhbət yoxdur.</div>`;
   $("#tickets").innerHTML = d.tickets.length ? `<table><tr><th>Bilet</th><th>Komanda</th><th>Xülasə</th></tr>${d.tickets.map((t) => `
     <tr><td><b>${esc(t.id)}</b><br>${tag(t.priority)} ${tag(t.source === "automation" ? "avto" : "agent", t.source === "automation" ? "voice" : "")}</td>
@@ -51,6 +53,19 @@ async function load() {
   $("#gaps").innerHTML = d.kb_gaps.length ? `<ul class="actions">${d.kb_gaps.map((g) => `<li>${esc(g)}</li>`).join("")}</ul>`
     : `<div class="empty">Boşluq tapılmadı.</div>`;
   window.lucide && window.lucide.createIcons();
+}
+
+// KPI numbers count up on first load
+function countUp() {
+  document.querySelectorAll(".kpi .v").forEach((el) => {
+    const to = +el.dataset.to, t0 = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / 1100), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(to * e);
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
 }
 
 fetch("/api/config").then((r) => r.json()).then((c) => { $("#model").textContent = `${c.model} · ${c.embed_model} · Neon`; });

@@ -7,7 +7,7 @@
   <link rel="icon" href="/static/brand/mallard.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css?v=7">
+  <link rel="stylesheet" href="/static/styles.css?v=11">
   <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
   <script type="importmap">
     { "imports": {
@@ -16,6 +16,7 @@
   </script>
 </head>
 <body>
+  <div class="orbs" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <header class="topbar">
     <div class="logo"><span class="logo-mark"><img src="/static/brand/mallard.svg" alt=""></span> Mallard</div>
     <nav class="nav-links">
@@ -52,19 +53,19 @@
     </section>
 
     <section class="trust">
-      <div class="item glass"><span class="ic"><i data-lucide="truck"></i></span><div><b>Pulsuz çatdırılma</b><span>50 ₼-dan yuxarı, Bakıda 1–2 gün</span></div></div>
-      <div class="item glass"><span class="ic"><i data-lucide="undo-2"></i></span><div><b>14 gün qaytarma</b><span>Zədəli məhsul pulsuz dəyişdirilir</span></div></div>
-      <div class="item glass"><span class="ic"><i data-lucide="shield-check"></i></span><div><b>36 aya qədər zəmanət</b><span>Rəsmi servis mərkəzi</span></div></div>
-      <div class="item glass"><span class="ic"><i data-lucide="credit-card"></i></span><div><b>0% hissə-hissə</b><span>BirKart ilə 3, 6, 12 ay</span></div></div>
+      <div class="item glass" data-reveal><span class="ic"><i data-lucide="truck"></i></span><div><b>Pulsuz çatdırılma</b><span>50 ₼-dan yuxarı, Bakıda 1–2 gün</span></div></div>
+      <div class="item glass" data-reveal><span class="ic"><i data-lucide="undo-2"></i></span><div><b>14 gün qaytarma</b><span>Zədəli məhsul pulsuz dəyişdirilir</span></div></div>
+      <div class="item glass" data-reveal><span class="ic"><i data-lucide="shield-check"></i></span><div><b>36 aya qədər zəmanət</b><span>Rəsmi servis mərkəzi</span></div></div>
+      <div class="item glass" data-reveal><span class="ic"><i data-lucide="credit-card"></i></span><div><b>0% hissə-hissə</b><span>BirKart ilə 3, 6, 12 ay</span></div></div>
     </section>
 
-    <div class="section-head" id="products">
+    <div class="section-head" id="products" data-reveal>
       <div><h2>Hamının sevdikləri.</h2><p>Seçilmiş məhsullar.</p></div>
       <div class="cats" id="cats"></div>
     </div>
     <section id="products-grid" class="grid"></section>
 
-    <section class="ai-band" id="aysu">
+    <section class="ai-band" id="aysu" data-reveal>
       <div>
         <div class="eyebrow">ChillDesk ilə</div>
         <h2>Tanış ol: Aysu.<br>Sənin şəxsi dəstək agentin.</h2>
@@ -72,17 +73,17 @@
         <button class="btn" id="band-aysu" style="margin-top:8px">Aysu ilə danış</button>
       </div>
       <div class="ai-feats">
-        <div class="ai-feat"><span class="ic"><i data-lucide="camera"></i></span><div><b>Şəkil göndər, həll al</b><span>Zədəli məhsulun şəklini göndər, Aysu görür və dəyişdirməni açır.</span></div></div>
-        <div class="ai-feat"><span class="ic"><i data-lucide="phone"></i></span><div><b>Səsli zəng</b><span>Azərbaycan dilində təbii səs, zəng kimi rahat.</span></div></div>
-        <div class="ai-feat"><span class="ic"><i data-lucide="zap"></i></span><div><b>Saniyələr içində</b><span>Sifariş statusu, çatdırılma, qaytarma, növbə gözləmədən.</span></div></div>
+        <div class="ai-feat" data-reveal><span class="ic"><i data-lucide="camera"></i></span><div><b>Şəkil göndər, həll al</b><span>Zədəli məhsulun şəklini göndər, Aysu görür və dəyişdirməni açır.</span></div></div>
+        <div class="ai-feat" data-reveal><span class="ic"><i data-lucide="phone"></i></span><div><b>Səsli zəng</b><span>Azərbaycan dilində təbii səs, zəng kimi rahat.</span></div></div>
+        <div class="ai-feat" data-reveal><span class="ic"><i data-lucide="zap"></i></span><div><b>Saniyələr içində</b><span>Sifariş statusu, çatdırılma, qaytarma, növbə gözləmədən.</span></div></div>
       </div>
     </section>
 
-    <div class="section-head" id="reviews"><div><h2>Müştərilər nə deyir.</h2></div></div>
+    <div class="section-head" id="reviews" data-reveal><div><h2>Müştərilər nə deyir.</h2></div></div>
     <section class="reviews">
-      <div class="review glass"><div class="stars"></div><p>Qulaqlıq zədəli gəlmişdi, şəklini Aysuya göndərdim, bir dəqiqəyə dəyişdirmə açıldı.</p><small>Leyla M. · Bakı</small></div>
-      <div class="review glass"><div class="stars"></div><p>Gecə saat 2-də soyuducunun harada olduğunu soruşdum, dərhal izləmə nömrəsi ilə cavab gəldi.</p><small>Rəşad Ə. · Sumqayıt</small></div>
-      <div class="review glass"><div class="stars" data-n="4"></div><p>Səsli zəng çox rahatdır, nənəm də istifadə edə bilir.</p><small>Nigar H. · Bakı</small></div>
+      <div class="review glass" data-reveal><div class="stars"></div><p>Qulaqlıq zədəli gəlmişdi, şəklini Aysuya göndərdim, bir dəqiqəyə dəyişdirmə açıldı.</p><small>Leyla M. · Bakı</small></div>
+      <div class="review glass" data-reveal><div class="stars"></div><p>Gecə saat 2-də soyuducunun harada olduğunu soruşdum, dərhal izləmə nömrəsi ilə cavab gəldi.</p><small>Rəşad Ə. · Sumqayıt</small></div>
+      <div class="review glass" data-reveal><div class="stars" data-n="4"></div><p>Səsli zəng çox rahatdır, nənəm də istifadə edə bilir.</p><small>Nigar H. · Bakı</small></div>
     </section>
   </main>
 
@@ -125,6 +126,6 @@
     </div>
   </section>
 
-  <script type="module" src="/static/app.js?v=8"></script>
+  <script type="module" src="/static/app.js?v=10"></script>
 </body>
 </html>

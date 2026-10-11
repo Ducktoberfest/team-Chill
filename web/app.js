@@ -1,5 +1,6 @@
 // Mallard demo store + Aysu support widget (web chat over SSE, voice via ElevenLabs).
 import { AysuAvatar, TAG_EMOTION } from "./aysu-avatar.js?v=8";
+import { initMotion, reveal, tiltAll, flyToCart } from "./motion.js?v=10";
 
 const $ = (s) => document.querySelector(s);
 let aysu = null;        // avatar in the support panel
@@ -57,6 +58,7 @@ function addNote(text) {
   const el = document.createElement("div");
   el.className = "typing";
   el.textContent = text;
+  if (text === "Aysu yazır") el.insertAdjacentHTML("beforeend", '<span class="dots"><i></i><i></i><i></i></span>');
   $("#messages").append(el);
   scroll();
   return el;
@@ -274,7 +276,7 @@ async function boot() {
 function renderProducts(cat) {
   const list = cat === "Hamısı" ? products : products.filter((p) => p.category === cat);
   $("#products-grid").innerHTML = list.map((p) => `
-    <article class="card glass">
+    <article class="card glass" data-reveal>
       <div class="thumb"><img src="/static/img/${esc(p.id)}.jpg" alt="${esc(p.name)}" loading="lazy"
         onerror="this.replaceWith(Object.assign(document.createElement('i'), {dataset: {lucide: '${ICON[p.id] || "package"}'}})); window.lucide && lucide.createIcons();"></div>
       <div class="cat">${esc(p.category)}</div>
@@ -286,6 +288,8 @@ function renderProducts(cat) {
       </div>
     </article>`).join("");
   paintIcons();
+  reveal($("#products-grid"));
+  tiltAll(".card", 8);
 }
 
 function openPanel() { $("#panel").classList.add("open"); $("#fab").style.display = "none"; $("#input").focus(); }
@@ -298,7 +302,11 @@ $("#cats").addEventListener("click", (e) => {
 });
 $("#products-grid").addEventListener("click", (e) => {
   const b = e.target.closest(".add");
-  if (b) { $("#cart-count").textContent = ++cart; b.innerHTML = icon("check"); paintIcons(); }
+  if (b) {
+    $("#cart-count").textContent = ++cart;
+    b.innerHTML = icon("check"); b.classList.add("added"); paintIcons();
+    flyToCart(b.closest(".card").querySelector(".thumb img"), $(".cart"));
+  }
 });
 $("#hero-aysu").onclick = openPanel;
 $("#band-aysu").onclick = openPanel;
@@ -318,4 +326,5 @@ $("#call").onclick = toggleCall;
 $("#hangup").onclick = () => { if (voice) voice.endSession(); else if (cancelCall) cancelCall(); };
 $("#customer").addEventListener("change", () => { conversationId = null; $("#messages").innerHTML = ""; addMsg("bot", "Yeni söhbət. Necə kömək edə bilərəm?"); });
 
+initMotion();
 boot();
