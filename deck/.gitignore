@@ -1,3 +1,2 @@
-qa-*.jpg
-qa-sheet.jpg
-*.pdf
+node_modules/
+.venv/

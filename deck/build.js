@@ -90,8 +90,8 @@ function results() {
   // ---- layouts
   pres.defineSlideMaster({
     title: "DARK_TITLE", background: { path: path.join(ASSETS, "bg-dark.png") },
-    objects: [{ placeholder: { options: { name: "title", type: "title", x: 0.8, y: 2.35, w: 7.2, h: 1.4, fontSize: 60, bold: true, color: C.background1, valign: "top", align: "left", margin: 0 }, text: "" } },
-              { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 3.75, w: 6.8, h: 1.2, fontSize: 22, color: C.background2, valign: "top", align: "left", margin: 0 }, text: "" } }],
+    objects: [{ placeholder: { options: { name: "title", type: "title", x: 0.8, y: 2.35, w: 5.9, h: 1.4, fontSize: 60, bold: true, color: C.background1, valign: "top", align: "left", margin: 0 }, text: "" } },
+              { placeholder: { options: { name: "body", type: "body", x: 0.8, y: 3.75, w: 5.7, h: 1.2, fontSize: 22, color: C.background2, valign: "top", align: "left", margin: 0 }, text: "" } }],
   });
   pres.defineSlideMaster({
     title: "LIGHT_CONTENT", background: { path: path.join(ASSETS, "bg-light.png") },
@@ -140,7 +140,8 @@ function results() {
     text(s, `anim_chipt${i}`, t, { x: 0.8 + i * 2.75, y: 5.25, w: i ? 3.0 : 2.55, h: 0.48, fontSize: 14, bold: true, align: "center", valign: "middle", color: C.background1 });
   });
   text(s, "anim_team", "team-Chill · Ducktoberfest Baku 2026 · Hacktoberfest Hack Day", { x: 0.8, y: 6.55, w: 7, h: 0.4, fontSize: 14, color: C.accent2 });
-  await shot(s, "anim_phone", "05-call-aysu.png", 8.75, 0.6, 3.55, true);
+  await shot(s, "anim_site", "01-hero.jpg", 7.0, 1.25, 5.75, true);
+  await shot(s, "anim_site2", "02-products.jpg", 8.3, 3.85, 4.6, true);
   s.addNotes("ChillDesk: Mallard adlı onlayn mağaza üçün AI dəstək agenti. Beyni açıq çəkili Gemma 4-dür. Chat, şəkil və səsli zəng bir yerdədir, söhbətdən sonrakı işlər avtomatik görülür.");
 
   // =============================================================== 2. problem
@@ -176,8 +177,11 @@ function results() {
     text(s, `anim_fh${i}`, feats[i][1], { x: 1.6, y: y - 0.02, w: 4.4, h: 0.42, fontSize: 20, bold: true, color: C.text1 });
     text(s, `anim_fp${i}`, feats[i][2], { x: 1.6, y: y + 0.42, w: 4.4, h: 0.6, fontSize: 14, color: C.accent5 });
   }
-  await shot(s, "anim_hero", "01-hero.jpg", 6.35, 1.65, 6.3);
-  text(s, "anim_cap", "Mallard — Ducktoberfest üçün qurduğumuz demo mağaza", { x: 6.35, y: 4.75, w: 6.3, h: 0.35, fontSize: 12, color: C.accent5, align: "right" });
+  s.addImage({ path: path.join(ASSETS, "ripples-light.png"), x: 6.55, y: 2.6, w: 6.4, h: 6.4, transparency: 15 });
+  await shot(s, "anim_aysu", "07-aysu-portrait.png", 7.75, 1.4, 3.95);
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { objectName: "anim_badge", x: 8.0, y: 6.05, w: 3.45, h: 0.55, rectRadius: 0.27, fill: { color: C.background1 }, line: { color: C.accent1, width: 1 }, shadow: shadow() });
+  text(s, "anim_badget", [{ text: "Aysu", options: { bold: true, color: C.accent1 } }, { text: "  ·  Mallard dəstək agenti", options: { color: C.accent5 } }],
+    { x: 8.0, y: 6.05, w: 3.45, h: 0.55, fontSize: 14, align: "center", valign: "middle" });
   s.addNotes("Aysu dörd işi görür: alətlərlə real hərəkət, şəkli anlamaq, 3D avatarla səsli zəng və söhbətdən sonra avtomatlaşdırma.");
 
   // =============================================================== 4. photo demo
