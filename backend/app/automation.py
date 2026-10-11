@@ -32,7 +32,7 @@ async def analyze(conversation_id: str) -> dict | None:
     reply = await llm.chat([
         {"role": "system", "content": prompts.analyst_prompt()},
         {"role": "user", "content": f"Kanal: {conv['channel']}\n\n{_transcript(conv['messages'])}"},
-    ], json_schema=prompts.ANALYSIS_SCHEMA)
+    ], json_schema=prompts.ANALYSIS_SCHEMA, thinking="low")
     text = reply.text.strip().removeprefix("```json").removesuffix("```").strip()
     analysis = json.loads(text)
 

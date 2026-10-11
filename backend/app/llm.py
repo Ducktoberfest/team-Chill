@@ -48,11 +48,12 @@ def _gemini_client() -> genai.Client:
     return _gemini
 
 
-async def chat(messages: list[dict], tools: list[dict] | None = None, json_schema: dict | None = None) -> Reply:
+async def chat(messages: list[dict], tools: list[dict] | None = None, json_schema: dict | None = None,
+               thinking: str | None = None) -> Reply:
     """One model turn. Returns text and/or tool calls; the caller runs the tools and loops."""
     if config.LLM_BACKEND == "ollama":
         return await _chat_ollama(messages, tools, json_schema)
-    return await _chat_gemini(messages, tools, json_schema)
+    return await _chat_gemini(messages, tools, json_schema, thinking or config.GEMINI_THINKING)
 
 
 # ---------------------------------------------------------------- Gemini API
@@ -82,12 +83,14 @@ def _to_gemini(messages: list[dict]) -> tuple[str | None, list[types.Content]]:
     return system, contents
 
 
-async def _chat_gemini(messages, tools, json_schema) -> Reply:
+async def _chat_gemini(messages, tools, json_schema, thinking) -> Reply:
     system, contents = _to_gemini(messages)
     cfg = types.GenerateContentConfig(
         system_instruction=system,
         temperature=0.4,
         automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+        # minimal thinking roughly halves latency, which matters for voice turns
+        thinking_config=types.ThinkingConfig(thinking_level=thinking),
     )
     if tools:
         cfg.tools = [types.Tool(function_declarations=[

@@ -52,6 +52,8 @@ def _session(conversation_id: str | None, channel: str, customer_id: str | None)
 
 
 def _save(s: Session) -> None:
+    if s.conversation_id not in HISTORY:  # conversation was closed while this turn was running
+        return
     db.execute("UPDATE conversations SET messages = %s, customer_id = %s, updated_at = now() WHERE id = %s",
                (db.Jsonb(agent.storable(HISTORY[s.conversation_id])), s.customer_id, s.conversation_id))
 
@@ -94,9 +96,9 @@ async def chat(body: ChatIn):
 
 @app.post("/api/conversations/{cid}/end")
 async def end_conversation(cid: str):
+    if cid in SESSIONS:
+        await asyncio.to_thread(_save, SESSIONS[cid])
     analysis = await automation.analyze(cid)
-    SESSIONS.pop(cid, None)
-    HISTORY.pop(cid, None)
     return {"conversation_id": cid, "analysis": analysis}
 
 
