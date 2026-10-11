@@ -97,6 +97,7 @@ async def main() -> None:
     ap.add_argument("--n", type=int, default=360)
     ap.add_argument("--concurrency", type=int, default=12)
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--extra", action="store_true", help="append everything to train.jsonl (keep the test set)")
     a = ap.parse_args()
     rng = random.Random(a.seed)
     sem = asyncio.Semaphore(a.concurrency)
@@ -111,8 +112,15 @@ async def main() -> None:
             print(f"{done}/{a.n} done, {len(rows)} ok", flush=True)
     rows.sort(key=lambda r: r["id"])
     rng.shuffle(rows)
-    n_test = max(40, len(rows) // 6)
     OUT.mkdir(exist_ok=True)
+    if a.extra:
+        with open(OUT / "train.jsonl", "a", encoding="utf-8") as f:
+            for r in rows:
+                r["id"] += 10_000 * a.seed
+                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        print(f"appended {len(rows)} to train")
+        return
+    n_test = max(40, len(rows) // 6)
     for name, part in (("test", rows[:n_test]), ("train", rows[n_test:])):
         with open(OUT / f"{name}.jsonl", "w", encoding="utf-8") as f:
             for r in part:

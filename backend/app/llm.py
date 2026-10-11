@@ -15,6 +15,7 @@ Tool specs: {"name": str, "description": str, "parameters": <JSON schema>}
 from __future__ import annotations
 
 import base64
+import logging
 import json
 import uuid
 from dataclasses import dataclass, field
@@ -24,6 +25,8 @@ from google import genai
 from google.genai import types
 
 from app import config
+
+log = logging.getLogger("chilldesk.llm")
 
 
 @dataclass
@@ -53,7 +56,14 @@ async def chat(messages: list[dict], tools: list[dict] | None = None, json_schem
     """One model turn. Returns text and/or tool calls; the caller runs the tools and loops."""
     if config.LLM_BACKEND == "ollama":
         return await _chat_ollama(messages, tools, json_schema)
-    return await _chat_gemini(messages, tools, json_schema, thinking or config.GEMINI_THINKING)
+    try:
+        return await _chat_gemini(messages, tools, json_schema, thinking or config.GEMINI_THINKING)
+    except LLMError as e:
+        # cloud quota or outage: the same open model family keeps answering locally
+        if config.OLLAMA_FALLBACK and ("429" in str(e) or "503" in str(e) or "500" in str(e)):
+            log.warning("Gemini unavailable (%s), falling back to local %s", str(e)[:80], config.OLLAMA_MODEL)
+            return await _chat_ollama(messages, tools, json_schema)
+        raise
 
 
 # ---------------------------------------------------------------- Gemini API

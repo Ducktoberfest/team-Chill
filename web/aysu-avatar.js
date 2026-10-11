@@ -16,8 +16,18 @@ const FACE_KEYS = ["jawOpen", "mouthSmile", "mouthStretch", "mouthFunnel", "mout
 const EMOTIONS = {
   neutral: {},
   happy: { mouthSmile: 0.55, browInnerUp: 0.12 },
+  warm: { mouthSmile: 0.38, browInnerUp: 0.1 },
+  excited: { mouthSmile: 0.65, browInnerUp: 0.35 },
   empathetic: { browInnerUp: 0.5, mouthSmile: 0.12 },
+  serious: { browDown: 0.22, mouthPress: 0.1 },
   concerned: { browInnerUp: 0.35, browDown: 0.25, mouthPress: 0.15 },
+};
+
+// ElevenLabs expressive audio tags -> face
+export const TAG_EMOTION = {
+  warmly: "warm", cheerfully: "happy", happily: "happy", excitedly: "excited", enthusiastically: "excited", laughing: "happy",
+  chuckles: "happy", empathetically: "empathetic", patiently: "empathetic", reassuringly: "empathetic", softly: "empathetic",
+  sighs: "concerned", seriously: "serious", confidently: "warm",
 };
 
 // letter -> mouth shape for text-only (chat) lip sync; Azerbaijani alphabet aware
@@ -47,6 +57,8 @@ export class AysuAvatar {
     this.blink = { next: performance.now() + 2000, t: -1, double: false };
     this.freqSource = null;
     this.textQueue = [];         // [{ at, pose }]
+    this.align = [];             // [{ start, end, pose }] from ElevenLabs character alignment
+    this.alignEnd = 0;
     this.visible = true;
     this.disposed = false;
   }
@@ -136,7 +148,38 @@ export class AysuAvatar {
   }
 
   useFrequencySource(fn) { this.freqSource = fn; this.textQueue = []; }
-  stopAudio() { this.freqSource = null; }
+  stopAudio() { this.freqSource = null; this.clearAlignment(); }
+
+  // ElevenLabs sends character timings with every audio chunk; chunks play back to back,
+  // so each chunk starts when the previous one ends (or now, if the queue is idle).
+  pushAlignment({ chars = [], char_start_times_ms: starts = [], char_durations_ms: durs = [] } = {}) {
+    const now = performance.now();
+    const t0 = Math.max(now + 40, this.alignEnd);
+    for (let i = 0; i < chars.length; i++) {
+      const ch = chars[i];
+      const start = t0 + (starts[i] || 0), end = start + (durs[i] || 60);
+      let pose = {};
+      if (/[a-zA-ZəƏçÇşŞğĞöÖüÜıİ]/.test(ch)) pose = (LETTER_SHAPES.find(([re]) => re.test(ch)) || [, { jawOpen: 0.2 }])[1];
+      this.align.push({ start, end, pose });
+      this.alignEnd = Math.max(this.alignEnd, end);
+    }
+  }
+  clearAlignment() { this.align = []; this.alignEnd = 0; }
+
+  mouthFromAlignment(now) {
+    while (this.align.length && this.align[0].end < now) this.align.shift();
+    if (!this.align.length) return null;
+    const cur = this.align[0];
+    if (cur.start > now) return { mouthPress: 0.15 };
+    // blend toward the next shape near the end of the current character (co-articulation)
+    const next = this.align[1];
+    const k = next ? clamp01((now - (cur.end - 35)) / 35) : 0;
+    const out = {};
+    for (const key of new Set([...Object.keys(cur.pose), ...(next ? Object.keys(next.pose) : [])])) {
+      out[key] = lerp(cur.pose[key] || 0, next ? next.pose[key] || 0 : 0, k);
+    }
+    return out;
+  }
 
   speakText(text) {
     // schedule one mouth shape per letter; pauses on punctuation, mouth closes between words
@@ -207,7 +250,14 @@ export class AysuAvatar {
     if (this.state === "listening") { target.mouthSmile = 0.16; target.browInnerUp = 0.08; }
     if (this.state === "thinking") { target.browDown = 0.18; target.mouthPress = 0.2; }
     let mouth = null;
-    if (this.freqSource) mouth = this.mouthFromAudio();
+    const aligned = this.mouthFromAlignment(now);
+    if (aligned && this.freqSource) {
+      // shape from the text timing, openness scaled by the real loudness of the voice
+      const fft = this.mouthFromAudio();
+      const loud = fft.mouthPress ? 0.35 : clamp01(0.55 + (fft.jawOpen || 0) * 0.9);
+      mouth = { ...aligned, jawOpen: (aligned.jawOpen || 0) * loud, mouthSmile: 0.06 };
+    } else if (aligned) mouth = aligned;
+    else if (this.freqSource) mouth = this.mouthFromAudio();
     else if (this.textQueue.length) mouth = this.mouthFromText(now);
     if (mouth) Object.assign(target, { mouthSmile: target.mouthSmile * 0.5 }, mouth);
     if (now < this.emotion.until) for (const [k, v] of Object.entries(this.emotion.pose)) target[k] = Math.max(target[k], v);

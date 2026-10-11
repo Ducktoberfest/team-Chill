@@ -20,6 +20,7 @@ GEMINI_MODEL = env("GEMINI_MODEL", "gemma-4-26b-a4b-it")
 GEMINI_THINKING = env("GEMINI_THINKING", "minimal")  # Gemma 4 26B on the Gemini API accepts only: minimal | high
 OLLAMA_URL = env("OLLAMA_URL", "http://localhost:11434").rstrip("/")
 OLLAMA_MODEL = env("OLLAMA_MODEL", "gemma4:e4b-it-qat")
+OLLAMA_FALLBACK = env("OLLAMA_FALLBACK", "1") == "1"  # use local Gemma when the Gemini API is rate-limited
 EMBED_MODEL = env("EMBED_MODEL", "embeddinggemma")
 EMBED_DIM = 768
 

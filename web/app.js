@@ -1,5 +1,5 @@
 // Mallard demo store + Aysu support widget (web chat over SSE, voice via ElevenLabs).
-import { AysuAvatar } from "./aysu-avatar.js?v=5";
+import { AysuAvatar, TAG_EMOTION } from "./aysu-avatar.js?v=8";
 
 const $ = (s) => document.querySelector(s);
 let aysu = null;        // avatar in the support panel
@@ -115,6 +115,22 @@ async function send(text) {
   }
 }
 
+// Aysu's face follows the tone of the call: the agent's expressive tag, or the customer's words
+const stripTags = (t) => t.replace(/\[[a-zA-Z ]{2,24}\]\s*/g, "").trim();
+const ANGRY = /(əsəb|bezdim|rəzalət|biabır|dəhşət|yenə|hələ də|niyə hələ|şikayət|pulumu|aldat|!!)/i;
+const THANKS = /(təşəkkür|sağ ol|çox sağ|əla|super|minnətdar|çox gözəl)/i;
+function reactToTone(source, text) {
+  if (!aysu) return;
+  if (source === "user") {
+    if (ANGRY.test(text)) aysu.setEmotion("empathetic", { durationMs: 6000 });
+    else if (THANKS.test(text)) aysu.setEmotion("happy", { durationMs: 4000 });
+    return;
+  }
+  const tag = (text.match(/\[([a-zA-Z]+)\]/) || [])[1];
+  const emo = tag && TAG_EMOTION[tag.toLowerCase()];
+  if (emo) aysu.setEmotion(emo, { durationMs: 7000 });
+}
+
 function reactToTool(ev) {
   const r = ev.result || {};
   if (ev.name === "create_return" && ["replacement", "refund"].includes(r.decision)) aysu?.setEmotion("happy", { durationMs: 4000 });
@@ -196,7 +212,7 @@ async function toggleCall() {
     if (cancelled) return;
     const session = await Conversation.startSession({
       agentId: config.agent_id,
-      connectionType: "webrtc",
+      connectionType: "websocket",   // websocket delivers per-character alignment for lip sync
       textOnly: false,
       customLlmExtraBody: { conversation_id: voiceId, customer_id: $("#customer").value || null },
       onConnect: () => {
@@ -214,8 +230,13 @@ async function toggleCall() {
       onModeChange: ({ mode }) => {
         setCallStatus(mode === "speaking" ? "Aysu danışır" : "Aysu dinləyir");
         aysu?.setState(mode === "speaking" ? "speaking" : "listening");
+        if (mode === "listening") aysu?.clearAlignment();
       },
-      onMessage: ({ source, message }) => addMsg(source === "user" ? "user" : "bot", message),
+      onAudioAlignment: (al) => aysu?.pushAlignment(al),
+      onMessage: ({ source, message }) => {
+        reactToTone(source, message);
+        addMsg(source === "user" ? "user" : "bot", stripTags(message));
+      },
       onError: (e) => addMsg("bot", "Səs xətası: " + (e?.message || e)),
       onDisconnect: () => {
         voice = null; calling = false; cancelCall = null;

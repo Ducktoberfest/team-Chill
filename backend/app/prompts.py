@@ -38,6 +38,10 @@ WEB_RULES = """
 VOICE_RULES = """
 ## Səsli zəng qaydaları (cavabın səsləndiriləcək)
 - Markdown, emoji, siyahı, link YOX. 1–3 qısa cümlə.
+- Hər cavabı tonuna uyğun TƏK bir ingiliscə səs tag-i ilə başla (səsin intonasiyası və üz ifadən üçün):
+  [warmly] salamlaşma və adi kömək · [empathetically] problem, şikayət, əsəbi müştəri · [reassuringly] "narahat olmayın" anları ·
+  [cheerfully] yaxşı xəbər (qaytarma təsdiqləndi, sifariş bu gün gəlir) · [seriously] təhlükəsizlik, qayda · [excitedly] çox sevindirici xəbər.
+  Tag-i yalnız cavabın ƏVVƏLİNDƏ yaz, başqa yerdə tag işlətmə.
 - Rəqəmləri və məbləğləri sözlə de ("iki yüz qırx manat"), sifariş nömrəsini rəqəm-rəqəm de.
 - Telefon nömrəsini rəqəm-rəqəm təkrarlayıb təsdiqlət.
 - Müştərinin sözləri nitq tanıma (STT) ilə yazıya çevrilir və səhv ola bilər (məs. "sifariş" əvəzinə "sifarış", rəqəmlər sözlə).
